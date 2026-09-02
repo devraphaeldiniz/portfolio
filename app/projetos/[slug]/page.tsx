@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projectsData } from "@/lib/projects";
-import { ArrowLeft, ExternalLink, CheckCircle2, ShieldAlert, Cpu } from "lucide-react";
+import { ArrowLeft, ExternalLink, CheckCircle2, ShieldAlert, Cpu, Code } from "lucide-react";
 
 export function generateStaticParams() {
   return projectsData.map((project) => ({
@@ -65,7 +65,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
                 href={project.demo} 
                 target="_blank" 
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-all shadow-lg shadow-blue-600/20"
               >
                 <ExternalLink className="w-4 h-4" /> Acessar Aplicação (Live Demo)
               </a>
@@ -91,17 +91,40 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
           </div>
         </section>
 
-        {/* Decisões de Arquitetura */}
+        {/* Diagrama e Arquitetura */}
         <section className="space-y-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Cpu className="w-6 h-6 text-blue-500" /> Arquitetura & Infraestrutura
+            <Cpu className="w-6 h-6 text-blue-500" /> Fluxo de Arquitetura
           </h2>
-          <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
+          <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 overflow-x-auto">
+            <pre className="font-mono text-xs sm:text-sm text-blue-400 leading-relaxed">
+              {project.architectureDiagram}
+            </pre>
+          </div>
+          <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
             {project.architecture.map((arch, idx) => (
               <p key={idx} className="text-sm text-slate-300 leading-relaxed">
                 • {arch}
               </p>
             ))}
+          </div>
+        </section>
+
+        {/* Snippet de Código */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Code className="w-6 h-6 text-blue-500" /> Implementação em Código
+          </h2>
+          <div className="rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden">
+            <div className="px-6 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between text-xs font-mono text-slate-400">
+              <span>{project.codeSnippet.title}</span>
+              <span className="uppercase text-blue-400">{project.codeSnippet.language}</span>
+            </div>
+            <div className="p-6 overflow-x-auto">
+              <pre className="font-mono text-xs sm:text-sm text-slate-200 leading-relaxed">
+                <code>{project.codeSnippet.code}</code>
+              </pre>
+            </div>
           </div>
         </section>
 
@@ -129,7 +152,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
             href="https://wa.me/5531994402252?text=Ol%C3%A1%20Raphael,%20vi%20seu%20projeto%20no%20portf%C3%B3lio%20e%20gostaria%20de%20conversar!"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all shadow-lg shadow-emerald-900/20"
           >
             Conversar no WhatsApp
           </a>

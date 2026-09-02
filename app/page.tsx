@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, ExternalLink, ArrowRight, MessageCircle } from "lucide-react";
+import { Mail, ExternalLink, ArrowRight, MessageCircle, FileText, User } from "lucide-react";
 import { projectsData } from "@/lib/projects";
 
 const GithubIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -77,7 +77,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-xl sm:text-2xl text-slate-400 max-w-3xl font-light leading-relaxed"
           >
-            <span className="text-white font-medium">Desenvolvedor Full Stack</span> especializado em arquitetura de dados relacional, aplicações modernas em Next.js, autenticação de alta segurança e microsserviços assíncronos.
+            <span className="text-white font-medium">Desenvolvedor Full Stack</span> especializado em arquitetura relacional, segurança avançada de dados, microsserviços assíncronos e ecossistema Next.js.
           </motion.p>
 
           <motion.div 
@@ -95,10 +95,17 @@ export default function Home() {
               <MessageCircle className="w-4 h-4 fill-white text-emerald-600" /> Chamar no WhatsApp
             </a>
             <a 
+              href="/curriculo.pdf" 
+              download="Raphael_Diniz_Curriculo.pdf"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-all shadow-lg shadow-blue-600/20"
+            >
+              <FileText className="w-4 h-4" /> Baixar Currículo (PDF)
+            </a>
+            <a 
               href="https://linkedin.com/in/devraphaeldiniz" 
               target="_blank" 
               rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-all shadow-lg shadow-blue-600/20"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 hover:bg-slate-800 text-white text-sm font-medium transition-all"
             >
               <LinkedinIcon className="w-4 h-4" /> LinkedIn
             </a>
@@ -109,12 +116,6 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 hover:bg-slate-800 text-white text-sm font-medium transition-all"
             >
               <GithubIcon className="w-4 h-4" /> GitHub
-            </a>
-            <a 
-              href="mailto:raphaelaloisiodiniz@gmail.com" 
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 hover:bg-slate-800 text-white text-sm font-medium transition-all"
-            >
-              <Mail className="w-4 h-4" /> E-mail
             </a>
           </motion.div>
         </section>
@@ -137,11 +138,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Projetos em Destaque - Cards Inteiramente Clicáveis */}
-        <section className="py-20 space-y-12">
+        {/* Projetos em Destaque */}
+        <section className="py-20 space-y-12 border-b border-slate-800">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Projetos em Destaque</h2>
-            <p className="text-slate-400 text-sm mt-1">Clique em qualquer card para conferir arquitetura, decisões técnicas e métricas.</p>
+            <p className="text-slate-400 text-sm mt-1">Clique no card para abrir o estudo de caso com arquitetura, decisões e snippets de código.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -192,7 +193,7 @@ export default function Home() {
 
                 <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-800/60">
                   <span className="text-xs font-semibold text-blue-400 group-hover:underline">
-                    Ver Estudo de Caso Completo →
+                    Ver Estudo de Caso & Código →
                   </span>
                   
                   {proj.demo && (
@@ -212,8 +213,26 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Seção Sobre Mim */}
+        <section className="py-20 space-y-6 border-b border-slate-800">
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-blue-400">
+            <User className="w-4 h-4" /> Sobre Mim
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Engenharia de Software com Foco em Solução e Confiabilidade
+          </h2>
+          <div className="space-y-4 text-slate-300 text-base leading-relaxed max-w-4xl">
+            <p>
+              Com background em processos analíticos, logística de alta pressão e supply chain, trago uma visão pragmática para a construção de software: sistemas não existem no vácuo, mas para resolver gargalos operacionais reais com zero tolerância a inconsistências de dados.
+            </p>
+            <p>
+              Minha atuação combina arquitetura relacional defensiva (Row Level Security, triggers, integridade relacional estrita), APIs eficientes em TypeScript e processamento assíncrono tolerante a falhas. Tenho facilidade de comunicação técnica com áreas de produto, autonomia de entrega e foco absoluto em padrões de código limpos e testáveis.
+            </p>
+          </div>
+        </section>
+
         {/* Footer */}
-        <footer className="pt-12 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <footer className="pt-12 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} Raphael Diniz. Todos os direitos reservados.</p>
           <div className="flex gap-6">
             <a href={whatsappUrl} target="_blank" rel="noreferrer" className="hover:text-emerald-400 transition-colors">WhatsApp</a>

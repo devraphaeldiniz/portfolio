@@ -8,7 +8,13 @@ export interface DetailedProject {
   github: string;
   demo?: string;
   highlights: string[];
+  architectureDiagram: string;
   architecture: string[];
+  codeSnippet: {
+    title: string;
+    language: string;
+    code: string;
+  };
   challenges: { problem: string; solution: string }[];
 }
 
@@ -17,30 +23,58 @@ export const projectsData: DetailedProject[] = [
     slug: "ecommerce-supabase",
     title: "E-commerce Backend & Infra",
     category: "Back-end & Arquitetura de Dados",
-    shortDescription: "Infraestrutura completa de banco de dados e APIs para e-commerce corporativo com foco em segurança granular e performance analítica.",
-    fullDescription: "Solução de infraestrutura completa para comércio eletrônico utilizando PostgreSQL e recursos de ponta do Supabase. O projeto foi projetado com foco em alta disponibilidade, integridade relacional, segurança de dados em nível de linha e conformidade com padrões de auditoria corporativa.",
+    shortDescription: "Infraestrutura de banco e APIs para e-commerce corporativo com foco em segurança granular e performance analítica.",
+    fullDescription: "Solução de infraestrutura completa para comércio eletrônico utilizando PostgreSQL e Supabase. Projetado para alta integridade relacional, isolamento de privilégios e auditoria em tempo real.",
     tags: ["PostgreSQL", "Supabase", "Row Level Security", "RBAC", "Docker", "CI/CD"],
     github: "https://github.com/devraphaeldiniz/ecommerce-supabase",
     highlights: [
-      "Controle de acesso granular (RBAC) em 4 níveis (Customer, Staff, Admin, Super Admin)",
-      "Políticas de Row Level Security (RLS) implementadas em 100% das tabelas",
-      "35+ índices estratégicos para otimização de leitura e escrita",
-      "6 views operacionais e 3 materialized views para analytics em tempo real",
-      "27 testes automatizados cobrindo segurança, integridade e regras de negócio"
+      "Controle de acesso granular (RBAC) em 4 níveis estritos",
+      "Políticas de Row Level Security (RLS) aplicadas a 100% das tabelas",
+      "35+ índices estratégicos (B-Tree, GIN) para otimização de queries",
+      "6 views operacionais e 3 materialized views para agregação contínua",
+      "27 testes automatizados cobrindo segurança, integridade e concorrência"
     ],
+    architectureDiagram: `[Client Request]
+       │
+       ▼
+[Supabase API / PostgREST]
+       │
+       ├──► [JWT Auth Validation]
+       │
+       ▼
+[PostgreSQL Database Engine]
+       ├──► [RLS Policies: auth.uid() = customer_id]
+       ├──► [RBAC Role Verification]
+       └──► [Triggers: Audit Logs & Materialized Views]`,
     architecture: [
-      "Database: PostgreSQL com schemas relacionais estritos e triggers de auditoria",
-      "Edge Functions: Processamento de webhooks e geração/exportação assíncrona de relatórios",
-      "CI/CD: Pipeline no GitHub Actions executando migrations e suíte de testes a cada push"
+      "Database: PostgreSQL com schemas isolados e triggers de auditoria",
+      "Segurança: Políticas RLS vinculadas a claims do JWT para isolamento por tenant/usuário",
+      "Pipeline: GitHub Actions validando migrações SQL e suíte de testes de integridade"
     ],
+    codeSnippet: {
+      title: "Política RLS Granular com Validação RBAC",
+      language: "sql",
+      code: `CREATE POLICY "admin_and_staff_access_orders"
+ON orders
+FOR ALL
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM user_roles
+    WHERE user_roles.user_id = auth.uid()
+      AND user_roles.role IN ('admin', 'staff')
+  )
+  OR auth.uid() = customer_id
+);`
+    },
     challenges: [
       {
-        problem: "Garantir isolamento absoluto de dados entre clientes e administradores em consultas diretas.",
-        solution: "Configuração de políticas RLS restritivas vinculadas ao auth_uid e tabela de roles de usuários."
+        problem: "Garantir isolamento total de dados entre clientes e operadores no acesso direto ao banco via PostgREST.",
+        solution: "Configuração de Row Level Security (RLS) restritiva combinando checagens de roles e tokens autenticados."
       },
       {
-        problem: "Quedas de performance em consultas consolidadas para relatórios gerenciais.",
-        solution: "Criação de Materialized Views com rotina de atualização automática para métricas diárias e RFM."
+        problem: "Lentidão nas consultas de relatórios operacionais consolidados.",
+        solution: "Criação de Materialized Views com rotina de atualização assíncrona para cálculos pesados de RFM e receita."
       }
     ]
   },
@@ -49,30 +83,53 @@ export const projectsData: DetailedProject[] = [
     title: "Gerador de Planos de Aula com IA",
     category: "Full Stack & IA Generativa",
     shortDescription: "Plataforma de criação automatizada de planos pedagógicos alinhados à BNCC, utilizando LLMs com validação de esquema rígida em runtime.",
-    fullDescription: "Aplicação full stack moderna que conecta o ecossistema educacional às capacidades de IA generativa do Google Gemini 2.5 Flash. Permite a educadores gerar planos de aula estruturados e prontos para sala de aula conforme diretrizes da Base Nacional Comum Curricular (BNCC).",
+    fullDescription: "Aplicação full stack moderna que conecta o ecossistema educacional às capacidades de IA generativa do Google Gemini 2.5 Flash, gerando planos estruturados conforme diretrizes da Base Nacional Comum Curricular (BNCC).",
     tags: ["Next.js 14", "TypeScript", "Google Gemini API", "Tailwind CSS", "Zod", "Supabase"],
     github: "https://github.com/devraphaeldiniz/plano-aula-ia",
     demo: "https://plano-aula-4i0xhojbb-raphaels-projects-004b90a9.vercel.app",
     highlights: [
-      "Integração de baixa latência com Google Gemini 2.5 Flash",
-      "Validação ponta a ponta com schemas Zod garantindo JSON uniforme",
-      "Estratégia de retries automatizados com variação de temperatura de amostragem",
-      "Persistência estruturada em PostgreSQL com colunas JSONB indexadas",
-      "Interface responsiva, acessível e otimizada via Tailwind CSS"
+      "Integração direta com Google Gemini 2.5 Flash via Server Actions",
+      "Validação ponta a ponta com schemas Zod garantindo tipagem forte em runtime",
+      "Estratégia de retries automatizados com ajuste adaptativo de temperatura",
+      "Persistência estruturada em PostgreSQL com suporte a campos JSONB",
+      "Interface responsiva e minimalista construída com Tailwind CSS"
     ],
+    architectureDiagram: `[Next.js Client] ──► [Server Action] ──► [Zod Input Validation]
+                                               │
+                                               ▼
+                                      [Gemini 2.5 Flash API]
+                                               │
+                                               ▼
+[PostgreSQL Database] ◄── [Safe Parsing] ◄── [Response Normalizer]`,
     architecture: [
-      "Frontend & Backend: Next.js 14 utilizando App Router e Route Handlers nativos",
-      "Validação de Dados: Zod tanto no cliente (React Hook Form) quanto nas APIs de servidor",
-      "Inteligência Artificial: Gemini SDK com sanitização contra delimitações indesejadas de markdown"
+      "Frontend: Next.js 14 (App Router) com React Hook Form",
+      "Validação: Zod garantindo imunidade a payloads malformados ou incompletos da LLM",
+      "Serviço de IA: SDK Gemini com pipeline de sanitização de blocos markdown e regex"
     ],
+    codeSnippet: {
+      title: "Pipeline de Validação e Sanitização de LLM com Zod",
+      language: "typescript",
+      code: `const PlanSchema = z.object({
+  tema: z.string().min(3),
+  habilidadesBNCC: z.array(z.string()),
+  metodologia: z.string().min(20),
+  recursos: z.array(z.string())
+});
+
+export async function parseGeminiResponse(rawText: string) {
+  const sanitized = rawText.replace(/\\\`\\\`\\\`json|\\\`\\\`\\\`/g, "").trim();
+  const parsedJson = JSON.parse(sanitized);
+  return PlanSchema.parse(parsedJson); // Garante conformidade estrita em runtime
+}`
+    },
     challenges: [
       {
         problem: "Variação na estrutura JSON devolvida pelo modelo de linguagem em requisições consecutivas.",
-        solution: "Criação de pipeline de parsing com sanitização regex e fallback de retry com temperatura mais restritiva."
+        solution: "Criação de parser intermediário com sanitização de formatação e fallback automático com temperatura restritiva."
       },
       {
         problem: "Falhas de tipagem estrita no processo de build em produção.",
-        solution: "Refatoração dos blocos de captura de erro do Zod para runtime typesafe."
+        solution: "Refatoração dos blocos de captura de erro do Zod para runtime typesafe defensivo."
       }
     ]
   },
@@ -81,29 +138,50 @@ export const projectsData: DetailedProject[] = [
     title: "RentalCar - Locação Enterprise",
     category: "Full Stack & Segurança Corporativa",
     shortDescription: "Sistema web escalável para gestão de frota e locações com camadas avançadas de autenticação multifator e monitoramento em tempo real.",
-    fullDescription: "Plataforma corporativa de gestão de frotas, reservas e pagamentos construída sob as mais rigorosas diretrizes de segurança de software corporativo. Oferece desde catálogo dinâmico de veículos até controle administrativo com auditoria de eventos em tempo real.",
+    fullDescription: "Plataforma corporativa de locação de veículos desenhada com arquitetura de alta segurança, cobrindo autenticação multifator (2FA), auditoria de acessos e painel analítico administrativo.",
     tags: ["Next.js 15", "TypeScript", "Nhost", "GraphQL", "Shadcn/ui", "PostgreSQL"],
     github: "https://github.com/devraphaeldiniz/rentalcar",
     highlights: [
-      "Autenticação de dois fatores (2FA/TOTP) compatível com Google Authenticator",
-      "Proteção contra força bruta com Rate Limiting (5 tentativas a cada 15 minutos)",
-      "Sistema de auditoria (Audit Logs) com retenção e rastreamento de IP e User-Agent",
-      "Painel administrativo executivo com métricas financeiras e de frota em tempo real",
-      "Gerenciamento de sessões ativas simultâneas com revogação remota"
+      "Autenticação de dois fatores (2FA / TOTP) compatível com autenticadores padrão",
+      "Proteção contra força bruta com Rate Limiting granular em rotas sensíveis",
+      "Sistema de auditoria (Audit Logs) rastreando IP, User-Agent e timestamps",
+      "Painel administrativo executivo com dashboards em tempo real",
+      "Gerenciamento e revogação remota de sessões ativas"
     ],
+    architectureDiagram: `[Next.js App Router] ──► [Auth Middleware (Rate Limit)]
+                                │
+                                ▼
+                       [Hasura GraphQL Engine]
+                                │
+                                ├──► [JWT Validation & 2FA State]
+                                │
+                                ▼
+                       [PostgreSQL 15 Cluster]
+                                └──► [Audit Logs Table (Triggers)]`,
     architecture: [
-      "Stack Web: Next.js 15 com App Router, TypeScript e Tailwind CSS",
-      "BaaS & Dados: Nhost integrando Hasura GraphQL Engine e PostgreSQL 15",
-      "Segurança Criptográfica: bcryptjs com 10 salt rounds e tokens JWT com rotação automática"
+      "Framework: Next.js 15 com TypeScript e Tailwind CSS",
+      "Dados & BaaS: Hasura GraphQL conectado ao PostgreSQL 15 via Nhost",
+      "Criptografia: bcryptjs com salt rounds configurados e TOTP baseado em chaves temporais"
     ],
+    codeSnippet: {
+      title: "Middleware de Verificação de 2FA e Sessão",
+      language: "typescript",
+      code: `export async function verifyUserSession(session: UserSession) {
+  if (!session.isValid) throw new Error("Sessão expirada");
+  if (session.requires2FA && !session.is2FAVerified) {
+    return { status: "REQUIRES_MFA", redirect: "/auth/verify-mfa" };
+  }
+  return { status: "AUTHORIZED", user: session.user };
+}`
+    },
     challenges: [
       {
-        problem: "Mitigação de tentativas automatizadas de invasão de credenciais.",
-        solution: "Implementação de middleware de rate limiting com persistência de tentativas em tabela relacional."
+        problem: "Mitigar ataques automatizados de força bruta em endpoints de login.",
+        solution: "Middleware com limitação de requisições persistido em banco para bloquear origens abusivas."
       },
       {
-        problem: "Manter sincronia de estados em um painel administrativo com alto fluxo de dados.",
-        solution: "Uso de queries GraphQL otimizadas e Server Components com renderização sob demanda."
+        problem: "Sincronização de estados em dashboards com alta frequência de atualizações.",
+        solution: "Implementação de queries GraphQL otimizadas associadas a Server Components do Next.js."
       }
     ]
   },
@@ -112,29 +190,55 @@ export const projectsData: DetailedProject[] = [
     title: "WhatsApp Disparador & Worker",
     category: "Back-end & Processamento Assíncrono",
     shortDescription: "Motor de mensageria com fila assíncrona desacoplada e persistida em banco, garantindo tolerância a falhas sem dependência de memória volátil.",
-    fullDescription: "Sistema de backend voltado para automação e sequenciamento de mensagens em massa. Toda a arquitetura foi desenhada para operar de maneira desacoplada de conexões HTTP e do ciclo de vida da interface, garantindo que reinicializações do servidor não interrompam filas.",
+    fullDescription: "Motor de mensageria assíncrono para envios em escala. Toda a lógica de filas opera de forma desacoplada do ciclo de vida das rotas HTTP, suportando reinicializações sem perda de tarefas.",
     tags: ["Node.js", "Express", "SQLite", "Workers", "WPPConnect", "REST API"],
     github: "https://github.com/devraphaeldiniz/whatsapp-disparador",
     highlights: [
       "Fila assíncrona 100% persistida em disco através de SQLite",
       "Worker em background desacoplado da camada de controllers da API",
-      "Controle de concorrência com delays randômicos para evitar bloqueios",
-      "Rotina automática de retentativas para mensagens não entregues",
-      "Modo mock nativo para execução em ambientes de CI e testes locais"
+      "Algoritmo de concorrência com jitter aleatório para prevenção de bans",
+      "Mecanismo automático de retentativas para mensagens rejeitadas",
+      "Modo mock nativo para baterias de testes em ambientes de CI"
     ],
+    architectureDiagram: `[HTTP Requests] ──► [Express Controller] ──► [Insert Job: PENDING]
+                                                        │
+                                                        ▼
+                                              [SQLite Queue Table]
+                                                        │
+                                                        ▼
+                                              [Background Worker Loop]
+                                                        │
+                                                        ├──► [Random Delay Jitter]
+                                                        ▼
+                                              [WPPConnect WhatsApp API]`,
     architecture: [
-      "Servidor: Node.js e Express expondo rotas REST para campanhas e importação CSV",
-      "Banco de Dados: better-sqlite3 operando em modo síncrono e de alta velocidade",
-      "Mecanismo de Fila: Scheduler baseado em datas futuras sem consumo volátil de memória"
+      "Backend: Node.js e Express expondo rotas REST",
+      "Banco: SQLite com driver nativo operando em transações atômicas",
+      "Fila: Scheduler baseado em timestamps e estados ('pending', 'processing', 'completed')"
     ],
+    codeSnippet: {
+      title: "Worker Contínuo com Transação Atômica",
+      language: "typescript",
+      code: `async function processNextJob() {
+  const job = db.prepare(\`
+    UPDATE queue 
+    SET status = 'processing', updated_at = ? 
+    WHERE id = (SELECT id FROM queue WHERE status = 'pending' LIMIT 1)
+    RETURNING *
+  \`).get(Date.now());
+
+  if (!job) return;
+  await dispatchMessage(job);
+}`
+    },
     challenges: [
       {
-        problem: "Risco de perda de fila de mensagens em caso de queda do container ou processo.",
-        solution: "Persistência do status da fila e controle da próxima execução exclusivamente via timestamps em banco."
+        problem: "Garantir integridade da fila de envios mesmo se o container cair.",
+        solution: "Toda alteração de estado é persistida atomicamente no SQLite, permitindo retomada imediata pós-crash."
       },
       {
-        problem: "Bloqueios decorrentes de envios em intervalos rígidos.",
-        solution: "Algoritmo de delay aleatório distribuído entre o limite mínimo e máximo configurado."
+        problem: "Evitar bloqueios na plataforma de mensageria provocados por envios rítmicos.",
+        solution: "Algoritmo de cálculo de delay não linear e distribuição randômica de intervalos."
       }
     ]
   }
