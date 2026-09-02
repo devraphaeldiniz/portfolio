@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, ExternalLink, ArrowRight, MessageCircle } from "lucide-react";
 import { projectsData } from "@/lib/projects";
@@ -30,6 +31,7 @@ const skills = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const whatsappUrl = "https://wa.me/5531994402252?text=Ol%C3%A1%20Raphael,%20vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar!";
 
   return (
@@ -135,11 +137,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Projetos com link para página detalhada */}
+        {/* Projetos em Destaque - Cards Inteiramente Clicáveis */}
         <section className="py-20 space-y-12">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Projetos em Destaque</h2>
-            <p className="text-slate-400 text-sm mt-1">Clique em qualquer projeto para conferir arquitetura, decisões técnicas e métricas.</p>
+            <p className="text-slate-400 text-sm mt-1">Clique em qualquer card para conferir arquitetura, decisões técnicas e métricas.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -150,19 +152,18 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-all group"
+                onClick={() => router.push(`/projetos/${proj.slug}`)}
+                className="flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all cursor-pointer group shadow-sm hover:shadow-lg hover:shadow-blue-500/5"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-blue-400 font-semibold uppercase tracking-wider">{proj.category}</span>
                   </div>
 
-                  <Link href={`/projetos/${proj.slug}`}>
-                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors flex items-center gap-2">
-                      {proj.title}
-                      <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-1 group-hover:translate-x-0" />
-                    </h3>
-                  </Link>
+                  <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors flex items-center justify-between">
+                    <span>{proj.title}</span>
+                    <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                  </h3>
 
                   <p className="text-sm text-slate-300 leading-relaxed">
                     {proj.shortDescription}
@@ -189,21 +190,20 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 pt-6 mt-6 border-t border-slate-800/60">
-                  <Link 
-                    href={`/projetos/${proj.slug}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors"
-                  >
+                <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-800/60">
+                  <span className="text-xs font-semibold text-blue-400 group-hover:underline">
                     Ver Estudo de Caso Completo →
-                  </Link>
+                  </span>
+                  
                   {proj.demo && (
                     <a 
                       href={proj.demo} 
                       target="_blank" 
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors ml-auto"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
                     >
-                      <ExternalLink className="w-4 h-4" /> Live Demo
+                      <ExternalLink className="w-3.5 h-3.5" /> Live Demo
                     </a>
                   )}
                 </div>
