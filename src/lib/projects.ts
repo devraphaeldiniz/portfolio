@@ -20,6 +20,77 @@ export interface DetailedProject {
 
 export const projectsData: DetailedProject[] = [
   {
+    slug: "fintech-core-engine",
+    title: "Fintech Core Engine & Ledger",
+    category: "Sistemas Distribuídos & Engenharia Financeira",
+    shortDescription: "Motor bancário de alta vazão e livro-razão contábil com partidas dobradas, isolamento anti-deadlock e telemetria nativa Prometheus/Grafana.",
+    fullDescription: "Core bancário de missão crítica desenvolvido em Go, PostgreSQL e Redis. Projetado para garantir conservação estrita de capital, zero race conditions sob cargas concorrentes extremas, desacoplamento assíncrono via Transactional Outbox Pattern e observabilidade operacional em tempo real.",
+    tags: ["Go", "PostgreSQL", "Redis", "Docker", "Prometheus", "Grafana", "Distributed Systems"],
+    github: "https://github.com/devraphaeldiniz/fintech-core-engine",
+    highlights: [
+      "Livro-razão contábil por partidas dobradas (Double-Entry Bookkeeping) estritamente imutável",
+      "Snapshots de saldo com leituras em O(1) e liquidação atômica em milissegundos",
+      "Travas distribuídas com Spin-Lock e backoff no Redis combinadas a locks léxicos no Postgres para prevenção de deadlocks (AB-BA)",
+      "Transactional Outbox Pattern desacoplando disparo de eventos sem risco de dual-write",
+      "Rotina autônoma de reconciliação contábil (Nightly Audit) comprovando balanços",
+      "Tabela do ledger particionada mensalmente por RANGE no PostgreSQL com auto-provisionamento para 12 meses",
+      "Telemetria nativa com métricas Prometheus (/metrics) e dashboard pré-provisionado no Grafana"
+    ],
+    architectureDiagram: `[Cliente / Gateway de Pagamento]
+              │
+              ▼ HTTPS (REST + SHA-256 API Key + Idempotency-Key)
+    [Fintech Core API (Go)]
+              │
+              ├──► [Redis Spin-Lock com Jitter] (Fila e contenção distribuída)
+              │
+              ▼ [PostgreSQL Engine - Transação Atômica]
+              ├──► 1. SELECT ... FOR UPDATE (Ordenação léxica dos UUIDs)
+              ├──► 2. Inserção imutável no Ledger particionado (DEBIT + CREDIT)
+              ├──► 3. Atualização atômica do snapshot de saldo O(1)
+              └──► 4. Gravação do evento na tabela outbox_events
+                             │
+                             ▼ Change Data Capture
+                     [Outbox Worker] ──► [Tópicos Assíncronos / Webhooks]`,
+    architecture: [
+      "Linguagem & Runtime: Go 1.23+ com pgxpool (PostgreSQL nativo) e cliente Redis v9",
+      "Isolamento Transacional: Lock pessimista léxico em nível SQL somado a Redis Mutex para contenção inicial",
+      "Banco de Dados: PostgreSQL 16 com particionamento declarativo mensal por data (RANGE)",
+      "Observabilidade: Instrumentação oficial do Prometheus coletando latência transacional (p95/p99) e vazão contábil"
+    ],
+    codeSnippet: {
+      title: "Transação Atômica com Ordenação Léxica Anti-Deadlock",
+      language: "go",
+      code: `// Ordenação léxica dos UUIDs para prevenir deadlocks cíclicos (AB-BA)
+firstID, secondID := fromID, toID
+if firstID.String() > secondID.String() {
+    firstID, secondID = toID, fromID
+}
+
+// Bloqueio pessimista sequencial no PostgreSQL
+if err := lockAccount(ctx, tx, firstID); err != nil {
+    return nil, err
+}
+if err := lockAccount(ctx, tx, secondID); err != nil {
+    return nil, err
+}
+
+// Verificação de saldo, double-entry e snapshot na mesma transação ACID
+if currentBalance < amountCents {
+    return nil, domain.ErrInsufficientFunds
+}`
+    },
+    challenges: [
+      {
+        problem: "Eliminar concorrência destrutiva e saldo negativo quando dezenas de transferências atingem a mesma conta no mesmo milissegundo.",
+        solution: "Estratégia híbrida de controle: Spin-lock adaptativo com jitter no Redis na entrada da requisição e bloqueio léxico FOR UPDATE no banco de dados, comprovado com 100% de consistência em testes de 50 requisições simultâneas."
+      },
+      {
+        problem: "Degradação de performance em relatórios e auditorias com crescimento exponencial dos lançamentos contábeis.",
+        solution: "Implementação de tabela mãe particionada por intervalo de datas (RANGE mensal) com rotina de manutenção contínua que provisiona automaticamente os próximos 12 meses."
+      }
+    ]
+  },
+  {
     slug: "ecommerce-supabase",
     title: "E-commerce Backend & Infra",
     category: "Back-end & Arquitetura de Dados",
