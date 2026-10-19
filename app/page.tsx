@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, ExternalLink, ArrowRight, MessageCircle, FileText, User } from "lucide-react";
+import { ExternalLink, ArrowRight, MessageCircle, FileText, User } from "lucide-react";
 import { projectsData } from "@/lib/projects";
 
 const GithubIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -154,7 +154,16 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.1 }}
                 onClick={() => router.push(`/projetos/${proj.slug}`)}
-                className="flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all cursor-pointer group shadow-sm hover:shadow-lg hover:shadow-blue-500/5"
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    router.push(`/projetos/${proj.slug}`);
+                  }
+                }}
+                role="link"
+                tabIndex={0}
+                aria-label={`Ver estudo de caso: ${proj.title}`}
+                className="flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all cursor-pointer group shadow-sm hover:shadow-lg hover:shadow-blue-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-xs">
