@@ -363,5 +363,54 @@ export async function parseGeminiResponse(rawText: string) {
         solution: "Algoritmo de cálculo de delay não linear e distribuição randômica de intervalos."
       }
     ]
+  },
+  {
+    slug: "jitterbit-orders-api",
+    title: "Jitterbit Orders API",
+    category: "Integrações & APIs Empresariais",
+    shortDescription: "API de integração para processamento e sincronização de pedidos entre sistemas corporativos.",
+    fullDescription: "Serviço focado na integração de pedidos, com contratos HTTP claros, validação de payloads e processamento orientado a confiabilidade para conectar sistemas distintos.",
+    tags: ["JavaScript", "Node.js", "REST API", "Integrações"],
+    github: "https://github.com/devraphaeldiniz/jitterbit-orders-api",
+    highlights: ["Integração de pedidos entre plataformas", "Contratos REST para comunicação entre sistemas", "Tratamento de erros e respostas previsíveis"],
+    architectureDiagram: `[Cliente / Sistema Origem] ──► [Orders API] ──► [Validação e Regras] ──► [Sistema Destino]`,
+    architecture: ["API REST para integração de pedidos", "Camada de validação e normalização de dados", "Fluxo preparado para observabilidade e retentativas"],
+    codeSnippet: { title: "Endpoint de pedidos", language: "javascript", code: `app.post(\"/orders\", async (req, res) => {\n  const order = validateOrder(req.body);\n  const result = await processOrder(order);\n  return res.status(201).json(result);\n});` },
+    challenges: [{ problem: "Manter consistência ao integrar payloads de origens diferentes.", solution: "Normalização e validação antes do processamento do pedido." }]
+  },
+  {
+    slug: "nexus",
+    title: "Nexus Platform",
+    category: "Produtos Digitais & Ecossistema Web",
+    shortDescription: "Projeto experimental de plataforma web para evolução de experiências digitais e integração entre serviços.",
+    fullDescription: "Repositório dedicado à construção de uma plataforma web modular, explorando componentes reutilizáveis, integração de serviços e organização de produto para crescimento sustentável.",
+    tags: ["TypeScript", "React", "Web Platform"],
+    github: "https://github.com/devraphaeldiniz/nexus",
+    highlights: ["Arquitetura modular", "Componentes reutilizáveis", "Base preparada para evolução de produto"],
+    architectureDiagram: `[Web Client] ──► [Application Modules] ──► [Service Integrations]`,
+    architecture: ["Interface web modular", "Separação entre componentes e regras de negócio", "Integração preparada para serviços externos"],
+    codeSnippet: { title: "Módulo de plataforma", language: "typescript", code: `export function createModule(name: string) {\n  return { name, enabled: true };\n}` },
+    challenges: [{ problem: "Organizar funcionalidades para permitir evolução incremental.", solution: "Separação por módulos e contratos simples entre as partes do sistema." }]
+  },
+  {
+    slug: "nexus-shop",
+    title: "Nexus Shop — E-commerce de Smartphones",
+    category: "E-commerce & Segurança de Aplicações",
+    shortDescription: "E-commerce full stack com catálogo, checkout, múltiplos gateways de pagamento e arquitetura separada entre frontend e API.",
+    fullDescription: "Plataforma de e-commerce especializada em smartphones, construída com Next.js e TypeScript no frontend, Fastify e Prisma no backend, PostgreSQL para dados relacionais e Redis para cache e sessões. O projeto combina pagamentos com Stripe e Mercado Pago, autenticação com tokens rotativos e práticas de segurança para uma operação de comércio digital.",
+    tags: ["Next.js", "TypeScript", "Fastify", "Prisma", "PostgreSQL", "Redis", "Stripe", "Mercado Pago", "Docker"],
+    github: "https://github.com/devraphaeldiniz/nexus-shop",
+    highlights: ["Frontend e API organizados como aplicações independentes", "Integração com Stripe e Mercado Pago", "JWT com refresh token rotativo e RBAC", "Validação com Zod, rate limiting e headers de segurança", "Testes unitários, integração e E2E com CI/CD"],
+    architectureDiagram: `[Next.js Storefront] ──► [Fastify REST API] ──► [Prisma ORM]
+          │                         │                  │
+          ▼                         ▼                  ▼
+      [Zustand]              [JWT / RBAC]       [PostgreSQL]
+                                    │                  │
+                              [Redis Cache]      [Orders / Products]
+                                    │
+                         [Stripe / Mercado Pago]`,
+    architecture: ["Frontend: Next.js App Router, TypeScript, Tailwind, Zustand e componentes acessíveis", "Backend: Fastify com Prisma, autenticação JWT e documentação de API", "Dados: PostgreSQL para catálogo e pedidos, Redis para cache e sessões", "Operação: Docker Compose e pipeline de CI/CD com testes automatizados"],
+    codeSnippet: { title: "Validação de pedido com Zod", language: "typescript", code: `const OrderSchema = z.object({\n  items: z.array(z.object({\n    productId: z.string().uuid(),\n    quantity: z.number().int().positive(),\n  })).min(1),\n  paymentMethod: z.enum([\"stripe\", \"mercado_pago\"]),\n});` },
+    challenges: [{ problem: "Integrar pagamentos diferentes sem acoplar o checkout a um único provedor.", solution: "Separação da regra de pedido da implementação dos gateways, com contratos comuns para criação e confirmação de pagamentos." }, { problem: "Proteger operações sensíveis de autenticação e checkout.", solution: "Combinação de validação de entrada, rate limiting, CSRF, headers de segurança e rotação de refresh tokens." }]
   }
 ];

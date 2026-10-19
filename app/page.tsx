@@ -21,14 +21,19 @@ const LinkedinIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 
 const skills = [
   { name: "TypeScript / JavaScript", category: "Linguagens" },
-  { name: "Next.js 14 / 15 (App Router)", category: "Front-end" },
-  { name: "React & Tailwind CSS", category: "Front-end" },
-  { name: "Node.js & Express", category: "Back-end" },
+  { name: "Go / PHP / Node.js", category: "Back-end" },
+  { name: "Next.js / React / Tailwind", category: "Front-end" },
   { name: "PostgreSQL & Supabase", category: "Banco de Dados" },
-  { name: "Row Level Security (RLS) & RBAC", category: "Segurança" },
+  { name: "RLS, RBAC & 2FA", category: "Segurança" },
   { name: "Docker & CI/CD", category: "DevOps" },
-  { name: "Arquitetura com Workers & Filas", category: "Engenharia" }
+  { name: "Workers, Filas & APIs", category: "Engenharia" }
 ];
+
+const featuredSlugs = ["fintech-core-engine", "nexus-shop", "ecommerce-supabase", "nexus-commerce"];
+const featuredProjects = featuredSlugs
+  .map((slug) => projectsData.find((project) => project.slug === slug))
+  .filter((project): project is (typeof projectsData)[number] => Boolean(project));
+const otherProjects = projectsData.filter((project) => !featuredSlugs.includes(project.slug));
 
 export default function Home() {
   const router = useRouter();
@@ -141,14 +146,15 @@ export default function Home() {
         {/* Projetos em Destaque */}
         <section className="py-20 space-y-12 border-b border-slate-800">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Projetos em Destaque</h2>
-            <p className="text-slate-400 text-sm mt-1">Clique no card para abrir o estudo de caso com arquitetura, decisões e snippets de código.</p>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400">Seleção estratégica</span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2">Projetos que demonstram impacto</h2>
+            <p className="text-slate-400 text-sm mt-2 max-w-2xl">Uma seleção dos trabalhos mais relevantes para avaliar arquitetura, segurança, dados, integrações e capacidade de entrega em produção.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projectsData.map((proj, idx) => (
+            {featuredProjects.map((proj, idx) => (
               <motion.div 
-                key={idx}
+                key={proj.slug}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -220,6 +226,25 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+
+          {otherProjects.length > 0 && (
+            <div className="space-y-6 pt-8">
+              <div>
+                <h3 className="text-xl font-bold text-white">Outros projetos</h3>
+                <p className="text-sm text-slate-400 mt-1">Explore também os demais repositórios e estudos de caso.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {otherProjects.map((project) => (
+                  <Link key={project.slug} href={`/projetos/${project.slug}`} className="group rounded-xl border border-slate-800 bg-slate-900/40 p-5 transition-all hover:-translate-y-1 hover:border-blue-500/50 hover:bg-slate-900/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                    <span className="text-xs uppercase tracking-wider text-blue-400">{project.category}</span>
+                    <h3 className="mt-2 font-semibold text-white group-hover:text-blue-400">{project.title}</h3>
+                    <p className="mt-2 text-xs leading-relaxed text-slate-400">{project.shortDescription}</p>
+                    <span className="mt-4 inline-block text-xs font-semibold text-blue-400">Ver estudo de caso →</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Seção Sobre Mim */}

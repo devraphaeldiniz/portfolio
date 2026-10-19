@@ -1,13 +1,36 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projectsData } from "@/lib/projects";
 import { ArrowLeft, ExternalLink, CheckCircle2, ShieldAlert, Cpu, Code } from "lucide-react";
 
 export function generateStaticParams() {
-  return projectsData.map((project) => ({
-    slug: project.slug,
-  }));
+  return projectsData.map((project) => ({ slug: project.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = projectsData.find((item) => item.slug === slug);
+
+  if (!project) return {};
+
+  return {
+    title: project.title,
+    description: project.shortDescription,
+    alternates: { canonical: `/projetos/${project.slug}` },
+    openGraph: {
+      type: "article",
+      title: project.title,
+      description: project.shortDescription,
+      url: `/projetos/${project.slug}`,
+      siteName: "Raphael Diniz",
+    },
+  };
 }
 
 export default async function ProjectPage({
