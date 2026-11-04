@@ -20,57 +20,6 @@ export interface DetailedProject {
 
 export const projectsData: DetailedProject[] = [
   {
-    slug: "nexus-commerce",
-    title: "Nexus Commerce & Marketplace Engine",
-    category: "Full Stack & Arquitetura de Plataformas de Pagamento",
-    shortDescription: "Marketplace escalável com custódia financeira (Escrow), moderação de lojistas em tempo real e painel operacional unificado com validação de CPF e RBAC.",
-    fullDescription: "Plataforma completa de comércio eletrônico multi-tenant construída com Laravel 11 e Vue.js 3. Implementa retenção de fundos em garantia (Escrow flow) até a confirmação de entrega, segregação estrita de privilégios (RBAC com Admin, Seller e Customer), moderação ativa de lojistas parceiros, emissão de tokens de autenticação via Sanctum/remember_tokens e esteira de deploy conteinerizada no Railway integrada com PostgreSQL.",
-    tags: ["Laravel 11", "Vue.js 3", "PHP 8.3", "PostgreSQL", "Docker", "Tailwind CSS", "Railway", "Vite", "REST API"],
-    github: "https://github.com/devraphaeldiniz/nexus-commerce",
-    demo: "https://frontend-production-3603.up.railway.app",
-    highlights: [
-      "Fluxo financeiro com retenção em garantia (Escrow) e carteiras de vendedores (seller_wallets)",
-      "Role-Based Access Control (RBAC) com permissões granulares para ADMIN, SELLER e CUSTOMER",
-      "Fila em tempo real para auditoria e aprovação prévia de vendedores pelo painel administrativo",
-      "Central administrativa com vinculação e validação de CPF, auditoria de login e gestão de credenciais",
-      "Interface reativa construída com Vue 3 Composition API integrada com tailwindcss e catálogo assíncrono",
-      "Deploy contínuo em containers Docker no Railway com banco de dados gerenciado PostgreSQL"
-    ],
-    architectureDiagram: `[Navegador / Cliente]
-          │
-          ▼ HTTPS / Vite + Vue.js 3 (SPA)
-[Frontend Cloud (Railway)]
-          │
-          ▼ REST API (Bearer Tokens / Sanctum)
-[Laravel 11 REST Engine]
-          │
-          ├──► [Auth & RBAC Middleware] (Admin / Seller / Customer)
-          ├──► [Escrow & Wallet Processor] (Retenção / Liberação de Saldo)
-          └──► [PostgreSQL Database] (Users, Profiles, Wallets, Products, Orders)`,
-    architecture: [
-      "Frontend: SPA reativa em Vue 3 (Composition API) com visualização dinâmica de catálogo, gaveta de checkout e modal unificado de controle administrativo",
-      "Backend: Laravel 11 estruturado em camadas de serviço, controllers RESTful e middleware customizado para validação de RBAC",
-      "Segurança e Identidade: Hash de senhas Bcrypt, validação de unicidade de e-mail/CPF e emissão de tokens de sessão persistente",
-      "Dados: Modelagem relacional no PostgreSQL com tabelas dedicadas a seller_profiles, seller_wallets e produtos moderados",
-      "Infraestrutura: Provisionamento isolado de microsserviços frontend e backend na nuvem Railway"
-    ],
-    codeSnippet: {
-      title: "Rotas de Moderação e Painel Administrativo",
-      language: "php",
-      code: "Route::middleware('api.auth')->group(function () {\n    Route::get('/admin/sellers/pending', function (Request $request) {\n        if ($request->user()->role !== 'ADMIN') {\n            return response()->json(['message' => 'Acesso negado.'], 403);\n        }\n        return User::where('role', 'SELLER')->where('is_approved', false)->latest()->get();\n    });\n\n    Route::post('/admin/sellers/{id}/approve', function (Request $request, $id) {\n        if ($request->user()->role !== 'ADMIN') {\n            return response()->json(['message' => 'Acesso negado.'], 403);\n        }\n        $seller = User::where('role', 'SELLER')->findOrFail($id);\n        $seller->is_approved = true;\n        $seller->save();\n        return response()->json(['message' => \"Vendedor {$seller->name} aprovado!\"]);\n    });\n});"
-    },
-    challenges: [
-      {
-        problem: "Garantir que lojistas recém-cadastrados não publiquem produtos na vitrine antes de passarem por aprovação documental e antifraude.",
-        solution: "Implementação de trava condicional na camada de cadastro e criação automática de registros vinculados em seller_profiles com status pendente, associado a middleware que valida a flag is_approved antes de liberar rotas de criação no catálogo."
-      },
-      {
-        problem: "Centralizar operações de perfis heterogêneos (Admin, Lojista e Comprador) mantendo a interface leve e responsiva.",
-        solution: "Desenvolvimento de modal de controle unificado com abas dinâmicas no Vue 3, carregando formulários de gestão de CPF, segurança, moderação e catálogo sob demanda conforme o perfil autenticado."
-      }
-    ]
-  },
-  {
     slug: "fintech-core-engine",
     title: "Fintech Core Engine & Ledger",
     category: "Sistemas Distribuídos & Engenharia Financeira",
@@ -152,9 +101,9 @@ if currentBalance < amountCents {
     highlights: [
       "Controle de acesso granular (RBAC) em 4 níveis estritos",
       "Políticas de Row Level Security (RLS) aplicadas a 100% das tabelas",
-      "35+ índices estratégicos (B-Tree, GIN) para otimização de queries",
+      "59 índices (B-Tree, GIN) para otimização de queries",
       "6 views operacionais e 3 materialized views para agregação contínua",
-      "27 testes automatizados cobrindo segurança, integridade e concorrência"
+      "27 testes automatizados cobrindo segurança e integridade"
     ],
     architectureDiagram: `[Client Request]
        │
@@ -257,53 +206,61 @@ export async function parseGeminiResponse(rawText: string) {
   },
   {
     slug: "rentalcar",
-    title: "RentalCar - Locação Enterprise",
-    category: "Full Stack & Segurança Corporativa",
-    shortDescription: "Sistema web escalável para gestão de frota e locações com camadas avançadas de autenticação multifator e monitoramento em tempo real.",
-    fullDescription: "Plataforma corporativa de locação de veículos desenhada com arquitetura de alta segurança, cobrindo autenticação multifator (2FA), auditoria de acessos e painel analítico administrativo.",
-    tags: ["Next.js 15", "TypeScript", "Nhost", "GraphQL", "Shadcn/ui", "PostgreSQL"],
+    title: "RentalCar - Locação de Veículos",
+    category: "Full Stack & Segurança",
+    shortDescription: "Sistema de locação de veículos com catálogo, reservas validadas, painel administrativo e limite de tentativas de login. 2FA em desenvolvimento.",
+    fullDescription: "Plataforma de locação de veículos em Next.js 14 e TypeScript, com backend no Nhost (Hasura GraphQL + PostgreSQL). Tem catálogo de veículos, reservas com validação de datas, painel administrativo, trilha de auditoria e limite de tentativas de login. A autenticação em duas etapas (2FA por TOTP) está em desenvolvimento.",
+    tags: ["Next.js 14", "TypeScript", "Nhost", "GraphQL", "PostgreSQL", "Zod", "Vitest"],
     github: "https://github.com/devraphaeldiniz/rentalcar",
     highlights: [
-      "Autenticação de dois fatores (2FA / TOTP) compatível com autenticadores padrão",
-      "Proteção contra força bruta com Rate Limiting granular em rotas sensíveis",
-      "Sistema de auditoria (Audit Logs) rastreando IP, User-Agent e timestamps",
-      "Painel administrativo executivo com dashboards em tempo real",
-      "Gerenciamento e revogação remota de sessões ativas"
+      "Limite de tentativas de login: 5 falhas por e-mail em 15 minutos, contadas no banco via Hasura",
+      "Validação de reservas com Zod (data final depois da inicial), coberta por testes com Vitest",
+      "Painel administrativo com veículos, reservas, usuários, avaliações e relatórios",
+      "Trilha de auditoria de ações e logins",
+      "Exportação de relatórios em PDF com jsPDF",
+      "Em desenvolvimento: 2FA por TOTP (a geração do QR Code já funciona)"
     ],
-    architectureDiagram: `[Next.js App Router] ──► [Auth Middleware (Rate Limit)]
-                                │
-                                ▼
-                       [Hasura GraphQL Engine]
-                                │
-                                ├──► [JWT Validation & 2FA State]
-                                │
-                                ▼
-                       [PostgreSQL 15 Cluster]
-                                └──► [Audit Logs Table (Triggers)]`,
+    architectureDiagram: `[Next.js App Router]
+          │
+          ▼ Route Handlers / Server Actions
+[Validação Zod + Limite de tentativas]
+          │
+          ▼ GraphQL
+[Hasura (Nhost)] ──► [PostgreSQL]
+          │
+          └──► [Nhost Auth (JWT)]`,
     architecture: [
-      "Framework: Next.js 15 com TypeScript e Tailwind CSS",
-      "Dados & BaaS: Hasura GraphQL conectado ao PostgreSQL 15 via Nhost",
-      "Criptografia: bcryptjs com salt rounds configurados e TOTP baseado em chaves temporais"
+      "Framework: Next.js 14 (App Router) com TypeScript e Tailwind CSS",
+      "Dados: Hasura GraphQL sobre PostgreSQL, hospedados no Nhost",
+      "Autenticação: Nhost Auth com JWT, validado no servidor antes das rotas de admin"
     ],
     codeSnippet: {
-      title: "Middleware de Verificação de 2FA e Sessão",
+      title: "Limite de tentativas de login por e-mail (resumido)",
       language: "typescript",
-      code: `export async function verifyUserSession(session: UserSession) {
-  if (!session.isValid) throw new Error("Sessão expirada");
-  if (session.requires2FA && !session.is2FAVerified) {
-    return { status: "REQUIRES_MFA", redirect: "/auth/verify-mfa" };
+      code: `export async function checkRateLimit(
+  identifier: string,
+  maxAttempts: number = 5,
+  windowMinutes: number = 15
+): Promise<RateLimitResult> {
+  // conta no Hasura as tentativas que falharam dentro da janela
+  const timeWindow = new Date(Date.now() - windowMinutes * 60 * 1000).toISOString()
+  const attempts = result.data?.login_attempts_aggregate?.aggregate?.count || 0
+
+  return {
+    allowed: attempts < maxAttempts,
+    remaining: Math.max(0, maxAttempts - attempts),
+    resetAt: new Date(Date.now() + windowMinutes * 60 * 1000)
   }
-  return { status: "AUTHORIZED", user: session.user };
 }`
     },
     challenges: [
       {
-        problem: "Mitigar ataques automatizados de força bruta em endpoints de login.",
-        solution: "Middleware com limitação de requisições persistido em banco para bloquear origens abusivas."
+        problem: "Bloquear tentativas repetidas de adivinhar a senha no login.",
+        solution: "Cada tentativa é registrada no banco; antes de autenticar, uma consulta agregada no Hasura conta as falhas do e-mail nos últimos 15 minutos e bloqueia a partir da quinta."
       },
       {
-        problem: "Sincronização de estados em dashboards com alta frequência de atualizações.",
-        solution: "Implementação de queries GraphQL otimizadas associadas a Server Components do Next.js."
+        problem: "Impedir reservas com período inválido.",
+        solution: "Schema Zod com regra que exige data final depois da inicial, validado no servidor e coberto por testes unitários com Vitest."
       }
     ]
   },
@@ -366,51 +323,98 @@ export async function parseGeminiResponse(rawText: string) {
   },
   {
     slug: "jitterbit-orders-api",
-    title: "Jitterbit Orders API",
-    category: "Integrações & APIs Empresariais",
-    shortDescription: "API de integração para processamento e sincronização de pedidos entre sistemas corporativos.",
-    fullDescription: "Serviço focado na integração de pedidos, com contratos HTTP claros, validação de payloads e processamento orientado a confiabilidade para conectar sistemas distintos.",
-    tags: ["JavaScript", "Node.js", "REST API", "Integrações"],
+    title: "API REST de Pedidos",
+    category: "Back-end & APIs",
+    shortDescription: "API REST de pedidos em Node.js e Express, com autenticação JWT, validação com Zod e documentação Swagger. Feita como teste técnico.",
+    fullDescription: "API REST para criar, consultar, atualizar e remover pedidos e seus itens, desenvolvida como teste técnico para uma vaga de backend. Recebe o pedido em um formato de entrada, mapeia para o formato do banco e grava pedido e itens no Supabase (PostgreSQL).",
+    tags: ["Node.js", "Express", "Supabase", "PostgreSQL", "JWT", "Zod", "Swagger"],
     github: "https://github.com/devraphaeldiniz/jitterbit-orders-api",
-    highlights: ["Integração de pedidos entre plataformas", "Contratos REST para comunicação entre sistemas", "Tratamento de erros e respostas previsíveis"],
-    architectureDiagram: `[Cliente / Sistema Origem] ──► [Orders API] ──► [Validação e Regras] ──► [Sistema Destino]`,
-    architecture: ["API REST para integração de pedidos", "Camada de validação e normalização de dados", "Fluxo preparado para observabilidade e retentativas"],
-    codeSnippet: { title: "Endpoint de pedidos", language: "javascript", code: `app.post(\"/orders\", async (req, res) => {\n  const order = validateOrder(req.body);\n  const result = await processOrder(order);\n  return res.status(201).json(result);\n});` },
-    challenges: [{ problem: "Manter consistência ao integrar payloads de origens diferentes.", solution: "Normalização e validação antes do processamento do pedido." }]
+    highlights: [
+      "CRUD completo de pedidos e itens com relacionamento (um pedido, vários itens)",
+      "Mapeamento do formato de entrada (numeroPedido, idItem) para o formato do banco",
+      "Autenticação JWT nas rotas de pedidos",
+      "Validação de entrada com Zod e middleware global de erros",
+      "Rate limiting (100 requisições por minuto) e logs com Morgan e Winston",
+      "Documentação interativa com Swagger"
+    ],
+    architectureDiagram: `[Cliente HTTP]
+      │
+      ▼
+[Express Router] ──► [Rate limit] ──► [JWT middleware]
+      │
+      ▼
+[Validação Zod] ──► [Controller] ──► [Supabase / PostgreSQL]
+      │                (mapeia entrada)     orders ◄── items
+      ▼
+[Error handler]`,
+    architecture: [
+      "Rotas, controllers, middlewares e validators em camadas separadas",
+      "Banco: tabelas orders e items no Supabase, com itens removidos em cascata",
+      "Observabilidade: logs de requisição com Morgan e logs da aplicação com Winston"
+    ],
+    codeSnippet: {
+      title: "Validação do pedido com Zod",
+      language: "javascript",
+      code: `exports.orderSchema = z.object({
+  numeroPedido: z.string().min(1),
+  valorTotal: z.number().positive(),
+  dataCriacao: z.string().min(1),
+  items: z.array(
+    z.object({
+      idItem: z.string().min(1),
+      quantidadeItem: z.number().positive(),
+      valorItem: z.number().positive()
+    })
+  )
+});`
+    },
+    challenges: [
+      {
+        problem: "O pedido chega num formato (numeroPedido, idItem) diferente do usado no banco (orderid, productid).",
+        solution: "O controller faz o mapeamento explícito antes de gravar, então a API aceita o formato do cliente sem mudar o modelo de dados."
+      },
+      {
+        problem: "Evitar que dados inválidos cheguem ao banco.",
+        solution: "Middleware de validação com Zod nas rotas de escrita e um middleware global que transforma erros em respostas padronizadas."
+      }
+    ]
   },
   {
     slug: "nexus",
-    title: "Nexus Platform",
-    category: "Produtos Digitais & Ecossistema Web",
-    shortDescription: "Projeto experimental de plataforma web para evolução de experiências digitais e integração entre serviços.",
-    fullDescription: "Repositório dedicado à construção de uma plataforma web modular, explorando componentes reutilizáveis, integração de serviços e organização de produto para crescimento sustentável.",
-    tags: ["TypeScript", "React", "Web Platform"],
+    title: "Nexus - Gestão de Associados",
+    category: "Full Stack & Segurança",
+    shortDescription: "Sistema web para gestão de associados, mensalidades e carteirinha digital com QR Code assinado.",
+    fullDescription: "Plataforma em PHP e MySQL para associações: cadastro e consulta de associados, controle de mensalidades, carteirinha digital e validação de acesso por QR Code. Tem perfis de administrador e associado, proteção CSRF e trilha de auditoria.",
+    tags: ["PHP", "MySQL", "Docker", "Render"],
     github: "https://github.com/devraphaeldiniz/nexus",
-    highlights: ["Arquitetura modular", "Componentes reutilizáveis", "Base preparada para evolução de produto"],
-    architectureDiagram: `[Web Client] ──► [Application Modules] ──► [Service Integrations]`,
-    architecture: ["Interface web modular", "Separação entre componentes e regras de negócio", "Integração preparada para serviços externos"],
-    codeSnippet: { title: "Módulo de plataforma", language: "typescript", code: `export function createModule(name: string) {\n  return { name, enabled: true };\n}` },
-    challenges: [{ problem: "Organizar funcionalidades para permitir evolução incremental.", solution: "Separação por módulos e contratos simples entre as partes do sistema." }]
-  },
-  {
-    slug: "nexus-shop",
-    title: "Nexus Shop — E-commerce de Smartphones",
-    category: "E-commerce & Segurança de Aplicações",
-    shortDescription: "E-commerce full stack com catálogo, checkout, múltiplos gateways de pagamento e arquitetura separada entre frontend e API.",
-    fullDescription: "Plataforma de e-commerce especializada em smartphones, construída com Next.js e TypeScript no frontend, Fastify e Prisma no backend, PostgreSQL para dados relacionais e Redis para cache e sessões. O projeto combina pagamentos com Stripe e Mercado Pago, autenticação com tokens rotativos e práticas de segurança para uma operação de comércio digital.",
-    tags: ["Next.js", "TypeScript", "Fastify", "Prisma", "PostgreSQL", "Redis", "Stripe", "Mercado Pago", "Docker"],
-    github: "https://github.com/devraphaeldiniz/nexus-shop",
-    highlights: ["Frontend e API organizados como aplicações independentes", "Integração com Stripe e Mercado Pago", "JWT com refresh token rotativo e RBAC", "Validação com Zod, rate limiting e headers de segurança", "Testes unitários, integração e E2E com CI/CD"],
-    architectureDiagram: `[Next.js Storefront] ──► [Fastify REST API] ──► [Prisma ORM]
-          │                         │                  │
-          ▼                         ▼                  ▼
-      [Zustand]              [JWT / RBAC]       [PostgreSQL]
-                                    │                  │
-                              [Redis Cache]      [Orders / Products]
-                                    │
-                         [Stripe / Mercado Pago]`,
-    architecture: ["Frontend: Next.js App Router, TypeScript, Tailwind, Zustand e componentes acessíveis", "Backend: Fastify com Prisma, autenticação JWT e documentação de API", "Dados: PostgreSQL para catálogo e pedidos, Redis para cache e sessões", "Operação: Docker Compose e pipeline de CI/CD com testes automatizados"],
-    codeSnippet: { title: "Validação de pedido com Zod", language: "typescript", code: `const OrderSchema = z.object({\n  items: z.array(z.object({\n    productId: z.string().uuid(),\n    quantity: z.number().int().positive(),\n  })).min(1),\n  paymentMethod: z.enum([\"stripe\", \"mercado_pago\"]),\n});` },
-    challenges: [{ problem: "Integrar pagamentos diferentes sem acoplar o checkout a um único provedor.", solution: "Separação da regra de pedido da implementação dos gateways, com contratos comuns para criação e confirmação de pagamentos." }, { problem: "Proteger operações sensíveis de autenticação e checkout.", solution: "Combinação de validação de entrada, rate limiting, CSRF, headers de segurança e rotação de refresh tokens." }]
+    highlights: [
+      "Perfis ADMIN e ASSOCIADO com login unificado",
+      "Senhas com Argon2id e proteção CSRF nos formulários",
+      "QR Code da carteirinha assinado com HMAC-SHA256 e com validade",
+      "Trilha de auditoria que oculta senhas e tokens nos registros",
+      "Controle de mensalidades e situação financeira do associado"
+    ],
+    architectureDiagram: `[Navegador] ──► [PHP (páginas admin / associado)] ──► [MySQL]
+                       │
+                       └──► [Validação do QR Code (HMAC)]`,
+    architecture: [
+      "Backend: PHP com PDO e sessões com cookies HttpOnly",
+      "Banco: MySQL com tabelas de usuários, mensalidades, auditoria e tentativas de login",
+      "Deploy: Docker no Render"
+    ],
+    codeSnippet: {
+      title: "QR Code assinado com HMAC",
+      language: "php",
+      code: `function qr_payload(int $id, int $version, string $validUntil): string {
+    $data = $id.'|'.$version.'|'.$validUntil;
+    return base64url_encode($data.'|'.hash_hmac('sha256', $data, qr_secret()));
+}`
+    },
+    challenges: [
+      {
+        problem: "Impedir que alguém falsifique a carteirinha gerando o próprio QR Code.",
+        solution: "O conteúdo do QR Code é assinado com HMAC-SHA256 usando um segredo do servidor; na leitura, a assinatura, a versão e a validade são conferidas."
+      }
+    ]
   }
 ];

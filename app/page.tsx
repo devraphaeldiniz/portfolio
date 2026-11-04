@@ -29,7 +29,7 @@ const skills = [
   { name: "Workers, Filas & APIs", category: "Engenharia" }
 ];
 
-const featuredSlugs = ["fintech-core-engine", "nexus-shop", "ecommerce-supabase", "nexus-commerce"];
+const featuredSlugs = ["ecommerce-supabase", "jitterbit-orders-api", "rentalcar", "whatsapp-disparador"];
 const featuredProjects = featuredSlugs
   .map((slug) => projectsData.find((project) => project.slug === slug))
   .filter((project): project is (typeof projectsData)[number] => Boolean(project));
