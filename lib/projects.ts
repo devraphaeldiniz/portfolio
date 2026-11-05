@@ -16,6 +16,9 @@ export interface DetailedProject {
     code: string;
   };
   challenges: { problem: string; solution: string }[];
+  cover?: string;
+  metrics?: { value: string; label: string }[];
+  gallery?: { src: string; caption: string; width: number; height: number }[];
 }
 
 export const projectsData: DetailedProject[] = [
@@ -257,53 +260,91 @@ export async function parseGeminiResponse(rawText: string) {
   },
   {
     slug: "rentalcar",
-    title: "RentalCar - Locação Enterprise",
-    category: "Full Stack & Segurança Corporativa",
-    shortDescription: "Sistema web escalável para gestão de frota e locações com camadas avançadas de autenticação multifator e monitoramento em tempo real.",
-    fullDescription: "Plataforma corporativa de locação de veículos desenhada com arquitetura de alta segurança, cobrindo autenticação multifator (2FA), auditoria de acessos e painel analítico administrativo.",
-    tags: ["Next.js 15", "TypeScript", "Nhost", "GraphQL", "Shadcn/ui", "PostgreSQL"],
+    title: "AstaCar — Locadora de Veículos",
+    category: "Produto Full Stack em Produção",
+    shortDescription: "Locadora completa no ar: busca por categoria, reserva com preço calculado no servidor, proteções e cupons, área do cliente e painel admin com funil de conversão, agenda da frota e gestão de preços.",
+    fullDescription: "O AstaCar é uma aplicação real de locação de veículos, publicada na Vercel e pensada como produto: o cliente escolhe o carro, monta a reserva com proteções e opcionais e vê exatamente quanto vai pagar; o time interno acompanha a frota, ajusta preços por temporada, cria cupons e mede onde os clientes desistem do funil. Todo valor é recalculado no servidor, o banco impede reservas sobrepostas e a coleta de métricas respeita a LGPD.",
+    tags: ["Next.js 15", "TypeScript", "Nhost", "Hasura GraphQL", "PostgreSQL", "Tailwind", "Zod", "Vitest", "Vercel"],
     github: "https://github.com/devraphaeldiniz/rentalcar",
-    highlights: [
-      "Autenticação de dois fatores (2FA / TOTP) compatível com autenticadores padrão",
-      "Proteção contra força bruta com Rate Limiting granular em rotas sensíveis",
-      "Sistema de auditoria (Audit Logs) rastreando IP, User-Agent e timestamps",
-      "Painel administrativo executivo com dashboards em tempo real",
-      "Gerenciamento e revogação remota de sessões ativas"
+    demo: "https://rentalcar-eight.vercel.app",
+    cover: "/projetos/astacar/01-home.jpg",
+    metrics: [
+      { value: "30+", label: "carros na frota" },
+      { value: "8", label: "categorias" },
+      { value: "37", label: "testes automatizados" },
+      { value: "0", label: "vulnerabilidades (npm audit)" }
     ],
-    architectureDiagram: `[Next.js App Router] ──► [Auth Middleware (Rate Limit)]
-                                │
-                                ▼
-                       [Hasura GraphQL Engine]
-                                │
-                                ├──► [JWT Validation & 2FA State]
-                                │
-                                ▼
-                       [PostgreSQL 15 Cluster]
-                                └──► [Audit Logs Table (Triggers)]`,
+    gallery: [
+      { src: "/projetos/astacar/01-home.jpg", caption: "Home: o cliente escolhe as datas e vê o valor total antes de reservar", width: 800, height: 500 },
+      { src: "/projetos/astacar/03-detalhe.jpg", caption: "Página do veículo com cotação em tempo real", width: 800, height: 500 },
+      { src: "/projetos/astacar/04-checkout.jpg", caption: "Checkout com proteções, opcionais, cupom e resumo linha a linha", width: 800, height: 500 },
+      { src: "/projetos/astacar/08-admin-funil.jpg", caption: "Funil de conversão e motivos de desistência", width: 800, height: 500 },
+      { src: "/projetos/astacar/10-admin-agenda.jpg", caption: "Agenda da frota: retiradas, devoluções e ocupação", width: 800, height: 500 },
+      { src: "/projetos/astacar/11-admin-precos.jpg", caption: "Preços inteligentes: temporadas, descontos por duração e cupons", width: 800, height: 500 },
+      { src: "/projetos/astacar/06-celular.jpg", caption: "Experiência responsiva no celular", width: 804, height: 780 }
+    ],
+    highlights: [
+      "Preço calculado só no servidor: diárias → temporada → desconto por duração → cupom → proteções e opcionais, com cada linha registrada na reserva",
+      "Constraint EXCLUDE (GiST) no PostgreSQL impede duas reservas do mesmo carro no mesmo período, mesmo com requisições simultâneas",
+      "Cupons com consumo atômico e CHECK no banco (uses <= max_uses): não há como estourar o limite",
+      "Funil de conversão próprio (busca → veículo → checkout → reserva) com consentimento LGPD, cookies httpOnly e sem guardar IP",
+      "Painel admin com agenda da frota, gestão de preços e cupons, banners, avaliações e trilha de auditoria",
+      "Sessão em cookies httpOnly, rate limit nas rotas sensíveis, CSP e validação de entrada com Zod",
+      "SEO: páginas por categoria, sitemap, robots e imagem Open Graph gerada dinamicamente",
+      "37 testes com Vitest, lint com Biome e 0 vulnerabilidades no npm audit"
+    ],
+    architectureDiagram: `[Navegador] ──► [Next.js 15 App Router · Vercel]
+                     │
+                     ├── Server Components (catálogo, área do cliente, admin)
+                     ├── Route Handlers /api/* ── Zod + rate limit + sessão httpOnly
+                     │        │
+                     │        └── lib/pricing.ts ── computeQuote() (preço no servidor)
+                     │
+                     ▼
+            [Nhost · Hasura GraphQL + Auth]
+                     │
+                     ▼
+            [PostgreSQL]
+              ├── bookings  ── EXCLUDE USING gist (sem sobreposição)
+              ├── coupons   ── CHECK uses <= max_uses
+              ├── pricing_rules · rental_extras · price_lines
+              └── analytics_events · audit_logs · banners`,
     architecture: [
-      "Framework: Next.js 15 com TypeScript e Tailwind CSS",
-      "Dados & BaaS: Hasura GraphQL conectado ao PostgreSQL 15 via Nhost",
-      "Criptografia: bcryptjs com salt rounds configurados e TOTP baseado em chaves temporais"
+      "Front e back no mesmo projeto Next.js 15 (App Router) com TypeScript estrito e Tailwind; deploy contínuo na Vercel",
+      "Nhost fornece Auth e Hasura GraphQL sobre PostgreSQL; regras críticas (integridade, limites, sobreposição) ficam no banco",
+      "Migrations versionadas e idempotentes aplicadas por script (npm run db:setup), com tabela de controle schema_migrations",
+      "Rotas de admin protegidas no layout e de novo em cada página/rota, porque a navegação no cliente pode pular o layout"
     ],
     codeSnippet: {
-      title: "Middleware de Verificação de 2FA e Sessão",
-      language: "typescript",
-      code: `export async function verifyUserSession(session: UserSession) {
-  if (!session.isValid) throw new Error("Sessão expirada");
-  if (session.requires2FA && !session.is2FAVerified) {
-    return { status: "REQUIRES_MFA", redirect: "/auth/verify-mfa" };
-  }
-  return { status: "AUTHORIZED", user: session.user };
-}`
+      title: "nhost/migrations/002_booking_integrity.sql — o banco garante que não existe overbooking",
+      language: "sql",
+      code: `ALTER TABLE bookings
+  ADD CONSTRAINT bookings_no_overlap
+  EXCLUDE USING gist (
+    vehicle_id WITH =,
+    daterange(start_date, end_date, '[)') WITH &&
+  )
+  WHERE (status IN ('pending', 'confirmed', 'active'));
+
+-- Duas reservas ativas do mesmo carro com períodos que se cruzam
+-- são rejeitadas pelo próprio PostgreSQL, sem depender da aplicação.`
     },
     challenges: [
       {
-        problem: "Mitigar ataques automatizados de força bruta em endpoints de login.",
-        solution: "Middleware com limitação de requisições persistido em banco para bloquear origens abusivas."
+        problem: "O valor mostrado ao cliente não pode ser manipulado pelo navegador, e precisa combinar temporada, desconto por duração, cupom e proteções sem erro de arredondamento.",
+        solution: "Uma função pura (computeQuote) roda no servidor em centavos, aplica as regras em ordem fixa, nunca deixa o valor negativo e devolve as linhas do orçamento, que ficam salvas na reserva. A mesma função alimenta a cotação e a criação da reserva."
       },
       {
-        problem: "Sincronização de estados em dashboards com alta frequência de atualizações.",
-        solution: "Implementação de queries GraphQL otimizadas associadas a Server Components do Next.js."
+        problem: "Dois clientes reservando o mesmo carro ao mesmo tempo poderiam gerar overbooking.",
+        solution: "Constraint EXCLUDE com GiST sobre (vehicle_id, daterange) no PostgreSQL: o banco rejeita a segunda reserva de forma atômica e a API devolve uma mensagem clara."
+      },
+      {
+        problem: "Medir onde o cliente desiste da reserva sem usar ferramentas de terceiros nem desrespeitar a LGPD.",
+        solution: "Tracking próprio que só grava eventos após consentimento, usa identificadores anônimos em cookies httpOnly, não armazena IP e pergunta o motivo quando o cliente abandona o checkout."
+      },
+      {
+        problem: "Datas calculadas em UTC faziam a reserva 'de hoje' virar 'ontem' depois das 21h no horário de Brasília.",
+        solution: "Data de referência calculada com Intl.DateTimeFormat no fuso America/Sao_Paulo e coberta por teste automatizado."
       }
     ]
   },

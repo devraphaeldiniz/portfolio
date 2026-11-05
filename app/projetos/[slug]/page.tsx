@@ -1,9 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projectsData } from "@/lib/projects";
-import { ArrowLeft, ExternalLink, CheckCircle2, ShieldAlert, Cpu, Code } from "lucide-react";
+import { ArrowLeft, ExternalLink, CheckCircle2, ShieldAlert, Cpu, Code, Images } from "lucide-react";
 
 export function generateStaticParams() {
   return projectsData.map((project) => ({ slug: project.slug }));
@@ -29,6 +30,7 @@ export async function generateMetadata({
       description: project.shortDescription,
       url: `/projetos/${project.slug}`,
       siteName: "Raphael Diniz",
+      ...(project.cover ? { images: [{ url: project.cover }] } : {}),
     },
   };
 }
@@ -100,6 +102,48 @@ export default async function ProjectPage({
             )}
           </div>
         </header>
+
+        {/* Números do projeto */}
+        {project.metrics && project.metrics.length > 0 && (
+          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {project.metrics.map((m) => (
+              <div key={m.label} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                <dt className="sr-only">{m.label}</dt>
+                <dd className="text-3xl font-extrabold text-white">{m.value}</dd>
+                <dd className="text-xs text-slate-400">{m.label}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        {/* Galeria */}
+        {project.gallery && project.gallery.length > 0 && (
+          <section id="galeria" className="space-y-6 scroll-mt-8">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <Images className="w-6 h-6 text-blue-500" /> A aplicação por dentro
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {project.gallery.map((img, idx) => (
+                <figure
+                  key={img.src}
+                  className={`overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 ${idx === 0 ? "sm:col-span-2" : ""}`}
+                >
+                  <a href={img.src} target="_blank" rel="noreferrer" className="block">
+                    <Image
+                      src={img.src}
+                      alt={img.caption}
+                      width={img.width}
+                      height={img.height}
+                      sizes={idx === 0 ? "(min-width: 896px) 896px, 100vw" : "(min-width: 640px) 440px, 100vw"}
+                      className="h-auto w-full transition-transform duration-500 hover:scale-[1.02]"
+                    />
+                  </a>
+                  <figcaption className="px-4 py-3 text-sm text-slate-400 border-t border-slate-800">{img.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Destaques Técnicos */}
         <section className="space-y-6">

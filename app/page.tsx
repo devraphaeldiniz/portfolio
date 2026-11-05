@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ExternalLink, ArrowRight, MessageCircle, FileText, User } from "lucide-react";
 import { projectsData } from "@/lib/projects";
+import AstaCarSpotlight from "@/components/astacar-spotlight";
 
 const GithubIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -33,7 +34,10 @@ const featuredSlugs = ["fintech-core-engine", "nexus-shop", "ecommerce-supabase"
 const featuredProjects = featuredSlugs
   .map((slug) => projectsData.find((project) => project.slug === slug))
   .filter((project): project is (typeof projectsData)[number] => Boolean(project));
-const otherProjects = projectsData.filter((project) => !featuredSlugs.includes(project.slug));
+const spotlightSlug = "rentalcar";
+const otherProjects = projectsData.filter(
+  (project) => !featuredSlugs.includes(project.slug) && project.slug !== spotlightSlug
+);
 
 export default function Home() {
   const router = useRouter();
@@ -66,6 +70,15 @@ export default function Home() {
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
             Disponível para novas oportunidades
           </motion.div>
+          <motion.a
+            href="#astacar"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/30 text-cyan-300 text-sm font-medium hover:bg-cyan-400/20 transition-colors"
+          >
+            Novo: AstaCar está no ar <ArrowRight className="w-3.5 h-3.5" />
+          </motion.a>
 
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
@@ -124,6 +137,9 @@ export default function Home() {
             </a>
           </motion.div>
         </section>
+
+        {/* Projeto principal */}
+        <AstaCarSpotlight />
 
         {/* Tecnologias */}
         <section className="py-16 border-b border-slate-800">
