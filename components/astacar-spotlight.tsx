@@ -13,10 +13,10 @@ const GithubIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 );
 
 const points = [
-  "Preço calculado no servidor com temporadas, descontos e cupons",
+  "Preço calculado no servidor e pagamento pelo Mercado Pago",
   "PostgreSQL impede overbooking com constraint EXCLUDE",
-  "Funil de conversão próprio, em conformidade com a LGPD",
-  "Painel admin: agenda da frota, preços, banners e auditoria",
+  "CNH conferida, contrato em PDF e vistoria na devolução",
+  "Painel admin com agenda, funil, preços e monitoramento",
 ];
 
 const thumbs = [
@@ -64,8 +64,8 @@ export default function AstaCarSpotlight() {
               </div>
 
               <p className="text-base text-slate-300 leading-relaxed">
-                Um produto completo e publicado: o cliente reserva com proteções, opcionais e cupom e vê cada centavo do preço;
-                o admin gerencia frota, temporadas, banners e acompanha o funil de conversão.
+                Um produto completo e publicado: o cliente reserva com proteções, opcionais e cupom, paga online e vê cada centavo do preço;
+                o admin gerencia frota, temporadas, vistorias e bloqueios de manutenção e acompanha o funil e os erros do site.
               </p>
 
               <ul className="grid gap-2 sm:grid-cols-2">
@@ -115,6 +115,15 @@ export default function AstaCarSpotlight() {
                   <GithubIcon /> Código
                 </a>
               </div>
+              {project.demo && (
+                <p className="text-xs text-slate-400">
+                  Sem cadastro:{" "}
+                  <a href={`${project.demo}/auth/signin`} target="_blank" rel="noreferrer" className="font-semibold text-cyan-300 underline-offset-2 hover:underline">
+                    entre como cliente ou veja o painel do admin
+                  </a>{" "}
+                  em modo demonstração (só leitura, dados pessoais mascarados).
+                </p>
+              )}
             </div>
 
             {/* Prints */}
