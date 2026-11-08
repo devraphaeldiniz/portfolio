@@ -262,16 +262,16 @@ export async function parseGeminiResponse(rawText: string) {
     slug: "rentalcar",
     title: "AstaCar — Locadora de Veículos",
     category: "Produto Full Stack em Produção",
-    shortDescription: "Locadora completa no ar: busca por categoria, reserva com preço calculado no servidor, proteções e cupons, área do cliente e painel admin com funil de conversão, agenda da frota e gestão de preços.",
-    fullDescription: "O AstaCar é uma aplicação real de locação de veículos, publicada na Vercel e pensada como produto: o cliente escolhe o carro, monta a reserva com proteções e opcionais e vê exatamente quanto vai pagar; o time interno acompanha a frota, ajusta preços por temporada, cria cupons e mede onde os clientes desistem do funil. Todo valor é recalculado no servidor, o banco impede reservas sobrepostas e a coleta de métricas respeita a LGPD.",
-    tags: ["Next.js 15", "TypeScript", "Nhost", "Hasura GraphQL", "PostgreSQL", "Tailwind", "Zod", "Vitest", "Vercel"],
+    shortDescription: "Locadora completa no ar: reserva com preço calculado no servidor, pagamento pelo Mercado Pago, CNH conferida, contrato em PDF, vistoria na retirada e na devolução e painel admin com agenda, funil e monitoramento. Dá para testar como cliente ou como admin, sem cadastro.",
+    fullDescription: "O AstaCar é uma aplicação real de locação de veículos, publicada na Vercel e pensada como produto: o cliente escolhe o carro, monta a reserva com proteções e opcionais e vê exatamente quanto vai pagar; o time interno acompanha a frota, ajusta preços por temporada, cria cupons e mede onde os clientes desistem do funil. Todo valor é recalculado no servidor, o banco impede reservas sobrepostas e bloqueios de manutenção, a CNH é conferida antes da reserva e a vistoria registra km, combustível e avarias. Quem visita o portfólio entra como cliente ou no painel do admin em modo demonstração, só leitura e com os dados pessoais mascarados.",
+    tags: ["Next.js 15", "TypeScript", "Nhost", "Hasura GraphQL", "PostgreSQL", "Mercado Pago", "Tailwind", "Zod", "Vitest", "Playwright", "Vercel"],
     github: "https://github.com/devraphaeldiniz/rentalcar",
     demo: "https://rentalcar-eight.vercel.app",
     cover: "/projetos/astacar/01-home.jpg",
     metrics: [
       { value: "30+", label: "carros na frota" },
-      { value: "8", label: "categorias" },
-      { value: "37", label: "testes automatizados" },
+      { value: "101", label: "testes + E2E no CI" },
+      { value: "100", label: "Lighthouse (acessib. e SEO)" },
       { value: "0", label: "vulnerabilidades (npm audit)" }
     ],
     gallery: [
@@ -281,6 +281,9 @@ export async function parseGeminiResponse(rawText: string) {
       { src: "/projetos/astacar/08-admin-funil.jpg", caption: "Funil de conversão e motivos de desistência", width: 800, height: 500 },
       { src: "/projetos/astacar/10-admin-agenda.jpg", caption: "Agenda da frota: retiradas, devoluções e ocupação", width: 800, height: 500 },
       { src: "/projetos/astacar/11-admin-precos.jpg", caption: "Preços inteligentes: temporadas, descontos por duração e cupons", width: 800, height: 500 },
+      { src: "/projetos/astacar/13-admin-demo-vistoria.jpg", caption: "Vistoria na devolução: km rodados, combustível que faltou, avarias novas e cobrança sugerida (painel em modo demonstração)", width: 1280, height: 1180 },
+      { src: "/projetos/astacar/12-login-demo.jpg", caption: "Login com as contas de demonstração: cliente ou painel do admin, sem cadastro", width: 1280, height: 800 },
+      { src: "/projetos/astacar/14-contrato-pdf.jpg", caption: "Contrato de locação em PDF gerado no servidor com as linhas de preço da reserva (exemplo com dados fictícios)", width: 910, height: 1287 },
       { src: "/projetos/astacar/06-celular.jpg", caption: "Experiência responsiva no celular", width: 804, height: 780 }
     ],
     highlights: [
@@ -288,10 +291,15 @@ export async function parseGeminiResponse(rawText: string) {
       "Constraint EXCLUDE (GiST) no PostgreSQL impede duas reservas do mesmo carro no mesmo período, mesmo com requisições simultâneas",
       "Cupons com consumo atômico e CHECK no banco (uses <= max_uses): não há como estourar o limite",
       "Funil de conversão próprio (busca → veículo → checkout → reserva) com consentimento LGPD, cookies httpOnly e sem guardar IP",
-      "Painel admin com agenda da frota, gestão de preços e cupons, banners, avaliações e trilha de auditoria",
+      "Bloqueio de carro para manutenção e vistoria com km, combustível e avarias: gatilhos no PostgreSQL recusam reserva em período bloqueado e devolução com km menor",
+      "CNH conferida no servidor antes de cada reserva (dígitos verificadores, categoria, validade na retirada e 2 anos de habilitação)",
+      "Pagamento online com Mercado Pago (Payment Brick) e webhook com assinatura validada; estorno automático ao cancelar",
+      "Painel admin com agenda da frota, gestão de preços e cupons, banners, contrato em PDF, avaliações e trilha de auditoria",
+      "Painel em modo demonstração para recrutadores: só leitura por construção e com nomes, e-mails, telefones e CPFs mascarados",
+      "Monitoramento próprio: erros do servidor (instrumentation.ts) e do navegador agrupados no painel, sem dados pessoais, e /api/health",
       "Sessão em cookies httpOnly, rate limit nas rotas sensíveis, CSP e validação de entrada com Zod",
       "SEO: páginas por categoria, sitemap, robots e imagem Open Graph gerada dinamicamente",
-      "37 testes com Vitest, lint com Biome e 0 vulnerabilidades no npm audit"
+      "101 testes com Vitest, testes de ponta a ponta com Playwright a cada deploy, Lighthouse 100 em acessibilidade e SEO e 0 vulnerabilidades no npm audit"
     ],
     architectureDiagram: `[Navegador] ──► [Next.js 15 App Router · Vercel]
                      │
@@ -307,13 +315,19 @@ export async function parseGeminiResponse(rawText: string) {
             [PostgreSQL]
               ├── bookings  ── EXCLUDE USING gist (sem sobreposição)
               ├── coupons   ── CHECK uses <= max_uses
+              ├── vehicle_blocks ── gatilhos (manutenção x reservas)
+              ├── booking_inspections ── gatilho (km da devolução)
               ├── pricing_rules · rental_extras · price_lines
-              └── analytics_events · audit_logs · banners`,
+              └── analytics_events · app_errors · audit_logs · banners
+
+[Mercado Pago] ──webhook assinado──► /api/webhooks/mercadopago
+[GitHub Actions] ── lint · tipos · testes · build · audit · E2E (Playwright)`,
     architecture: [
       "Front e back no mesmo projeto Next.js 15 (App Router) com TypeScript estrito e Tailwind; deploy contínuo na Vercel",
       "Nhost fornece Auth e Hasura GraphQL sobre PostgreSQL; regras críticas (integridade, limites, sobreposição) ficam no banco",
       "Migrations versionadas e idempotentes aplicadas por script (npm run db:setup), com tabela de controle schema_migrations",
-      "Rotas de admin protegidas no layout e de novo em cada página/rota, porque a navegação no cliente pode pular o layout"
+      "Rotas de admin protegidas no layout e de novo em cada página/rota, porque a navegação no cliente pode pular o layout",
+      "CI no GitHub Actions a cada PR e testes de ponta a ponta contra cada deploy de preview da Vercel"
     ],
     codeSnippet: {
       title: "nhost/migrations/002_booking_integrity.sql — o banco garante que não existe overbooking",
@@ -345,6 +359,14 @@ export async function parseGeminiResponse(rawText: string) {
       {
         problem: "Datas calculadas em UTC faziam a reserva 'de hoje' virar 'ontem' depois das 21h no horário de Brasília.",
         solution: "Data de referência calculada com Intl.DateTimeFormat no fuso America/Sao_Paulo e coberta por teste automatizado."
+      },
+      {
+        problem: "Deixar quem avalia o projeto ver o painel do admin funcionando, sem expor dados de clientes nem permitir alterações.",
+        solution: "Conta de demonstração com papel de cliente no banco: as rotas que alteram algo continuam recusando por construção. Uma checagem só de leitura libera o painel, e as respostas passam por uma função que mascara nomes, e-mails, telefones, CPFs e IPs."
+      },
+      {
+        problem: "Na limpeza do código antigo, os relatórios somavam valores do banco como texto (\"100\" + \"50\" virava \"10050\").",
+        solution: "Tipar as respostas do banco no lugar de any: o TypeScript passou a apontar as somas erradas. Conversão explícita com Number() e teste cobrindo valores que chegam como texto."
       }
     ]
   },
