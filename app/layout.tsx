@@ -4,11 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.devraphaeldiniz.com.br"),
   title: {
-    default: "Raphael Diniz | Desenvolvedor Backend Júnior",
+    default: "Raphael Diniz | Desenvolvedor Backend/Fullstack",
     template: "%s | Raphael Diniz",
   },
   description:
-    "Portfólio de Raphael Diniz — Desenvolvedor Backend Júnior com Node.js, TypeScript e PostgreSQL.",
+    "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack com Node.js, TypeScript e PostgreSQL. Criador do AstaCar, plataforma de aluguel de carros em produção.",
   keywords: [
     "Raphael Diniz",
     "desenvolvedor backend júnior",
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: "https://www.devraphaeldiniz.com.br",
     siteName: "Raphael Diniz",
-    title: "Raphael Diniz | Desenvolvedor Backend Júnior",
+    title: "Raphael Diniz | Desenvolvedor Backend/Fullstack",
     description:
-      "Portfólio de Raphael Diniz — Engenharia de software, arquitetura de dados e sistemas confiáveis.",
+      "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack com Node.js, TypeScript e PostgreSQL. Criador do AstaCar, plataforma de aluguel de carros em produção.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Raphael Diniz | Desenvolvedor Backend Júnior",
-    description: "Portfólio profissional de Raphael Diniz.",
+    title: "Raphael Diniz | Desenvolvedor Backend/Fullstack",
+    description: "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack. Criador do AstaCar, plataforma de aluguel de carros em produção.",
   },
   robots: { index: true, follow: true },
   icons: { icon: "/favicon.ico" },

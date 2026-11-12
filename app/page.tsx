@@ -95,7 +95,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-xl sm:text-2xl text-slate-400 max-w-3xl font-light leading-relaxed"
           >
-            <span className="text-white font-medium">Desenvolvedor Full Stack</span> especializado em arquitetura relacional, segurança avançada de dados, microsserviços assíncronos e ecossistema Next.js.
+            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy e levo os projetos até produção: o AstaCar, minha locadora de carros, está no ar com pagamentos reais e 101 testes.
           </motion.p>
 
           <motion.div 
@@ -265,13 +265,13 @@ export default function Home() {
 
         {/* Experiência e atuação */}
          <section className="py-20 space-y-10 border-b border-slate-800">
-           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Experiência prática em produtos e sistemas confiáveis</h2>
-           <p className="text-slate-300 leading-relaxed max-w-3xl">Minha experiência é apresentada por meio de projetos autorais e entregas práticas, da modelagem à publicação.</p>
+           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Experiência</h2>
+           <p className="text-slate-300 leading-relaxed max-w-3xl">Comecei do lado da operação, automatizei o meu próprio trabalho e hoje desenvolvo em tempo integral. A trajetória completa está no LinkedIn.</p>
            <div className="grid gap-4 md:grid-cols-3">
              {[
-               ["Projetos autorais", "Engenharia Full Stack", "Next.js, TypeScript, Laravel, Vue e APIs REST."],
-               ["Especialização prática", "Dados e segurança", "PostgreSQL, RLS, RBAC, auditoria e MFA."],
-               ["Entrega contínua", "Infraestrutura e operação", "Docker, CI/CD, deploy, workers e observabilidade."],
+               ["2026 · atual", "AstaCar · Projeto autoral", "Plataforma de aluguel de carros em produção na Vercel: Mercado Pago, Hasura, prevenção de overbooking no PostgreSQL e 101 testes automatizados."],
+               ["2022 a 2026", "Comprador · Rodoagro", "Único comprador da empresa. Automatizei o fluxo de cotações em JavaScript, integrado à API do ERP Omie, e reduzi em até 25% o custo de algumas máquinas."],
+               ["2020 a 2022", "Coordenador de logística · JM Transportes", "Liderança operacional em um dos maiores hubs do Mercado Livre, com foco em prazos, SLAs e eliminação de gargalos."],
              ].map(([period, title, text]) => (
                <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><span className="text-xs font-semibold uppercase tracking-wider text-blue-400">{period}</span><h3 className="mt-2 font-semibold text-white">{title}</h3><p className="mt-2 text-sm leading-relaxed text-slate-400">{text}</p></article>
              ))}
@@ -284,14 +284,14 @@ export default function Home() {
             <User className="w-4 h-4" /> Sobre Mim
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            Engenharia de Software com Foco em Solução e Confiabilidade
+            Do chão da operação para o código
           </h2>
           <div className="space-y-4 text-slate-300 text-base leading-relaxed max-w-4xl">
             <p>
-              Com background em processos analíticos, logística de alta pressão e supply chain, trago uma visão pragmática para a construção de software: sistemas não existem no vácuo, mas para resolver gargalos operacionais reais com zero tolerância a inconsistências de dados.
+              Antes do código, eu trabalhava com compras e logística. Foi automatizando o meu próprio trabalho, uma rotina de cotações integrada ao ERP, que descobri que queria construir software. Essa origem me deixou pragmático: sistema bom resolve um gargalo real e não corrompe dado.
             </p>
             <p>
-              Minha atuação combina arquitetura relacional defensiva (Row Level Security, triggers, integridade relacional estrita), APIs eficientes em TypeScript e processamento assíncrono tolerante a falhas. Tenho facilidade de comunicação técnica com áreas de produto, autonomia de entrega e foco absoluto em padrões de código limpos e testáveis.
+              Hoje trabalho com Node.js, TypeScript e PostgreSQL, com atenção especial à segurança no próprio banco (Row Level Security, triggers e constraints) e a processamento assíncrono. Escrevo código testável, converso bem com produto e entrego de ponta a ponta.
             </p>
           </div>
         </section>
@@ -300,6 +300,7 @@ export default function Home() {
         <footer className="pt-12 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} Raphael Diniz. Todos os direitos reservados.</p>
           <div className="flex gap-6">
+            <a href="mailto:raphaelaloisiodiniz@gmail.com" className="hover:text-blue-400 transition-colors">E-mail</a>
             <a href={whatsappUrl} target="_blank" rel="noreferrer" className="hover:text-emerald-400 transition-colors">WhatsApp</a>
             <a href="https://github.com/devraphaeldiniz" target="_blank" rel="noreferrer" className="hover:text-slate-400 transition-colors">GitHub</a>
             <a href="https://linkedin.com/in/devraphaeldiniz" target="_blank" rel="noreferrer" className="hover:text-slate-400 transition-colors">LinkedIn</a>

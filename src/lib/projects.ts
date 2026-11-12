@@ -74,7 +74,7 @@ export const projectsData: DetailedProject[] = [
     slug: "fintech-core-engine",
     title: "Fintech Core Engine & Ledger",
     category: "Sistemas Distribuídos & Engenharia Financeira",
-    shortDescription: "Motor bancário de alta vazão e livro-razão contábil com partidas dobradas, isolamento anti-deadlock e telemetria nativa Prometheus/Grafana.",
+    shortDescription: "Motor bancário experimental com livro-razão contábil por partidas dobradas, estratégia de ordenação de locks e telemetria Prometheus/Grafana.",
     fullDescription: "Core bancário de missão crítica desenvolvido em Go, PostgreSQL e Redis. Projetado para garantir conservação estrita de capital, zero race conditions sob cargas concorrentes extremas, desacoplamento assíncrono via Transactional Outbox Pattern e observabilidade operacional em tempo real.",
     tags: ["Go", "PostgreSQL", "Redis", "Docker", "Prometheus", "Grafana", "Distributed Systems"],
     github: "https://github.com/devraphaeldiniz/fintech-core-engine",
@@ -133,7 +133,7 @@ if currentBalance < amountCents {
     challenges: [
       {
         problem: "Eliminar concorrência destrutiva e saldo negativo quando dezenas de transferências atingem a mesma conta no mesmo milissegundo.",
-        solution: "Estratégia híbrida de controle: Spin-lock adaptativo com jitter no Redis na entrada da requisição e bloqueio léxico FOR UPDATE no banco de dados, comprovado com 100% de consistência em testes de 50 requisições simultâneas."
+        solution: "Estratégia híbrida de controle: Spin-lock adaptativo com jitter no Redis na entrada da requisição e bloqueio léxico FOR UPDATE no banco de dados, avaliado em testes locais de concorrência com 50 requisições simultâneas; consulte os testes e o benchmark no repositório."
       },
       {
         problem: "Degradação de performance em relatórios e auditorias com crescimento exponencial dos lançamentos contábeis.",

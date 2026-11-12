@@ -54,7 +54,7 @@ export default function AstaCarSpotlight() {
               </div>
 
               <div className="flex items-center gap-4">
-                <Image src="/projetos/astacar/logo.svg" alt="" width={56} height={56} className="h-14 w-14 rounded-2xl shadow-lg shadow-blue-600/30" />
+                <Image src="/projetos/astacar/logo.svg" alt="Logo do AstaCar" width={56} height={56} className="h-14 w-14 rounded-2xl shadow-lg shadow-blue-600/30" />
                 <div>
                   <h2 id="astacar-title" className="text-3xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-blue-100 to-cyan-300 bg-clip-text text-transparent">
                     AstaCar

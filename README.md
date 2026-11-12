@@ -1,4 +1,4 @@
-# Portfólio — Raphael Diniz
+# Portfólio · Raphael Diniz
 
 Site pessoal publicado em [devraphaeldiniz.com.br](https://www.devraphaeldiniz.com.br), com meus projetos de backend e uma página de detalhes para cada um.
 
@@ -13,7 +13,7 @@ Site pessoal publicado em [devraphaeldiniz.com.br](https://www.devraphaeldiniz.c
 
 - `app/page.tsx`: página inicial
 - `app/projetos/[slug]`: página de cada projeto
-- `src/lib/projects.ts`: dados dos projetos exibidos
+- `lib/projects.ts`: dados dos projetos exibidos
 - `app/sitemap.ts`, `app/robots.ts` e `app/opengraph-image.tsx`: SEO e imagem de compartilhamento
 
 ## Como rodar
