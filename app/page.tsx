@@ -294,6 +294,15 @@ export default function Home() {
               Hoje trabalho com Node.js, TypeScript e PostgreSQL, com atenção especial à segurança no próprio banco (Row Level Security, triggers e constraints) e a processamento assíncrono. Escrevo código testável, converso bem com produto e entrego de ponta a ponta.
             </p>
           </div>
+          <div className="pt-8 space-y-4 max-w-4xl border-t border-slate-800/60">
+            <h3 className="text-xl font-bold text-white pt-4">Fora do código</h3>
+            <p className="text-slate-300 text-base leading-relaxed">
+              Sou da região de BH, MG, e o primeiro da minha família a chegar à faculdade. Montei meu próprio PC peça por peça, e foi fuçando nele que o hábito de desmontar as coisas para entender como funcionam virou profissão. É o mesmo instinto do tempo de mecânico: abrir, diagnosticar, consertar.
+            </p>
+            <p className="text-slate-300 text-base leading-relaxed">
+              No tempo livre vou de academia, jogos e carros, de preferência entendendo o que tem embaixo do capô, além de filmes e séries com uma boa trilha sonora. E sou competitivo do jeito certo: problema que me vence hoje vira o primeiro item da lista de amanhã.
+            </p>
+          </div>
         </section>
 
         {/* Footer */}
