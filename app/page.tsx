@@ -162,9 +162,9 @@ export default function Home() {
         {/* Projetos em Destaque */}
         <section className="py-20 space-y-12 border-b border-slate-800">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400">Seleção estratégica</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2">Projetos que demonstram impacto</h2>
-            <p className="text-slate-400 text-sm mt-2 max-w-2xl">Uma seleção dos trabalhos mais relevantes para avaliar arquitetura, segurança, dados, integrações e capacidade de entrega em produção.</p>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400">Projetos</span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2">O que eu construí</h2>
+            <p className="text-slate-400 text-sm mt-2 max-w-2xl">Cada projeto aqui nasceu de um problema real. Pode abrir, clicar e testar: estão em produção ou com o código aberto no GitHub.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -263,7 +263,22 @@ export default function Home() {
           )}
         </section>
 
-        {/* Seção Sobre Mim */}
+        {/* Experiência e atuação */}
+         <section className="py-20 space-y-10 border-b border-slate-800">
+           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Experiência prática em produtos e sistemas confiáveis</h2>
+           <p className="text-slate-300 leading-relaxed max-w-3xl">Minha experiência é apresentada por meio de projetos autorais e entregas práticas, da modelagem à publicação.</p>
+           <div className="grid gap-4 md:grid-cols-3">
+             {[
+               ["Projetos autorais", "Engenharia Full Stack", "Next.js, TypeScript, Laravel, Vue e APIs REST."],
+               ["Especialização prática", "Dados e segurança", "PostgreSQL, RLS, RBAC, auditoria e MFA."],
+               ["Entrega contínua", "Infraestrutura e operação", "Docker, CI/CD, deploy, workers e observabilidade."],
+             ].map(([period, title, text]) => (
+               <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><span className="text-xs font-semibold uppercase tracking-wider text-blue-400">{period}</span><h3 className="mt-2 font-semibold text-white">{title}</h3><p className="mt-2 text-sm leading-relaxed text-slate-400">{text}</p></article>
+             ))}
+           </div>
+         </section>
+
+         {/* Seção Sobre Mim */}
         <section className="py-20 space-y-6 border-b border-slate-800">
           <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-blue-400">
             <User className="w-4 h-4" /> Sobre Mim
