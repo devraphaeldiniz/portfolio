@@ -41,7 +41,7 @@ const otherProjects = projectsData.filter(
 
 export default function Home() {
   const router = useRouter();
-  const whatsappUrl = "https://wa.me/5531994402252?text=Ol%C3%A1%20Raphael,%20vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar!";
+  const whatsappUrl = "https://wa.me/5531971611211?text=Ol%C3%A1%20Raphael,%20vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar!";
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white font-sans relative">
@@ -309,7 +309,7 @@ export default function Home() {
         <footer className="pt-12 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} Raphael Diniz. Todos os direitos reservados.</p>
           <div className="flex gap-6">
-            <a href="mailto:raphaelaloisiodiniz@gmail.com" className="hover:text-blue-400 transition-colors">E-mail</a>
+            <a href="mailto:devraphaeldiniz@gmail.com" className="hover:text-blue-400 transition-colors">E-mail</a>
             <a href={whatsappUrl} target="_blank" rel="noreferrer" className="hover:text-emerald-400 transition-colors">WhatsApp</a>
             <a href="https://github.com/devraphaeldiniz" target="_blank" rel="noreferrer" className="hover:text-slate-400 transition-colors">GitHub</a>
             <a href="https://linkedin.com/in/devraphaeldiniz" target="_blank" rel="noreferrer" className="hover:text-slate-400 transition-colors">LinkedIn</a>

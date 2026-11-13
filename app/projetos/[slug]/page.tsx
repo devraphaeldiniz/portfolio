@@ -221,7 +221,7 @@ export default async function ProjectPage({
         <div className="pt-12 border-t border-slate-800 text-center space-y-4">
           <p className="text-sm text-slate-400">Tem interesse em detalhes da arquitetura ou código deste projeto?</p>
           <a 
-            href="https://wa.me/5531994402252?text=Ol%C3%A1%20Raphael,%20vi%20seu%20projeto%20no%20portf%C3%B3lio%20e%20gostaria%20de%20conversar!"
+            href="https://wa.me/5531971611211?text=Ol%C3%A1%20Raphael,%20vi%20seu%20projeto%20no%20portf%C3%B3lio%20e%20gostaria%20de%20conversar!"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all shadow-lg shadow-emerald-900/20"
