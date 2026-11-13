@@ -154,7 +154,7 @@ if currentBalance < amountCents {
     github: "https://github.com/devraphaeldiniz/ecommerce-supabase",
     highlights: [
       "Controle de acesso granular (RBAC) em 4 níveis estritos",
-      "Políticas de Row Level Security (RLS) aplicadas a 100% das tabelas",
+      "Row Level Security ativado em todas as tabelas, com políticas por papel",
       "35+ índices estratégicos (B-Tree, GIN) para otimização de queries",
       "6 views operacionais e 3 materialized views para agregação contínua",
       "27 testes automatizados cobrindo segurança, integridade e concorrência"
