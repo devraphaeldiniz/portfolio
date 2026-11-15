@@ -95,7 +95,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-xl sm:text-2xl text-slate-400 max-w-3xl font-light leading-relaxed"
           >
-            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy e levo os projetos até produção: o AstaCar, minha locadora de carros, está no ar com pagamentos reais e 101 testes.
+            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy e levo os projetos até produção: o AstaCar, minha locadora de carros, está no ar com pagamento online pelo Mercado Pago (em modo de teste) e 101 testes.
           </motion.p>
 
           <motion.div 
