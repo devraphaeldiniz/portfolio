@@ -397,6 +397,7 @@ export async function parseGeminiResponse(rawText: string) {
     fullDescription: "Plataforma de e-commerce especializada em smartphones, construída com Next.js e TypeScript no frontend, Fastify e Prisma no backend, PostgreSQL para dados relacionais e Redis para cache e sessões. O projeto combina pagamentos com Stripe e Mercado Pago, autenticação com tokens rotativos e práticas de segurança para uma operação de comércio digital.",
     tags: ["Next.js", "TypeScript", "Fastify", "Prisma", "PostgreSQL", "Redis", "Stripe", "Mercado Pago", "Docker"],
     github: "https://github.com/devraphaeldiniz/nexus-shop",
+    demo: "https://nexus-shop-raphaeldiniz.vercel.app",
     highlights: ["Frontend e API organizados como aplicações independentes", "Integração com Stripe e Mercado Pago", "JWT com refresh token rotativo e RBAC", "Validação com Zod, rate limiting e headers de segurança", "Testes unitários, integração e E2E com CI/CD"],
     architectureDiagram: `[Next.js Storefront] ──► [Fastify REST API] ──► [Prisma ORM]
           │                         │                  │
