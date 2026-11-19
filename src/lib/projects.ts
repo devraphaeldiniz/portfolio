@@ -20,70 +20,19 @@ export interface DetailedProject {
 
 export const projectsData: DetailedProject[] = [
   {
-    slug: "nexus-commerce",
-    title: "Nexus Commerce & Marketplace Engine",
-    category: "Full Stack & Arquitetura de Plataformas de Pagamento",
-    shortDescription: "Marketplace escalável com custódia financeira (Escrow), moderação de lojistas em tempo real e painel operacional unificado com validação de CPF e RBAC.",
-    fullDescription: "Plataforma completa de comércio eletrônico multi-tenant construída com Laravel 11 e Vue.js 3. Implementa retenção de fundos em garantia (Escrow flow) até a confirmação de entrega, segregação estrita de privilégios (RBAC com Admin, Seller e Customer), moderação ativa de lojistas parceiros, emissão de tokens de autenticação via Sanctum/remember_tokens e esteira de deploy conteinerizada no Railway integrada com PostgreSQL.",
-    tags: ["Laravel 11", "Vue.js 3", "PHP 8.3", "PostgreSQL", "Docker", "Tailwind CSS", "Railway", "Vite", "REST API"],
-    github: "https://github.com/devraphaeldiniz/nexus-commerce",
-    demo: "https://frontend-production-3603.up.railway.app",
-    highlights: [
-      "Fluxo financeiro com retenção em garantia (Escrow) e carteiras de vendedores (seller_wallets)",
-      "Role-Based Access Control (RBAC) com permissões granulares para ADMIN, SELLER e CUSTOMER",
-      "Fila em tempo real para auditoria e aprovação prévia de vendedores pelo painel administrativo",
-      "Central administrativa com vinculação e validação de CPF, auditoria de login e gestão de credenciais",
-      "Interface reativa construída com Vue 3 Composition API integrada com tailwindcss e catálogo assíncrono",
-      "Deploy contínuo em containers Docker no Railway com banco de dados gerenciado PostgreSQL"
-    ],
-    architectureDiagram: `[Navegador / Cliente]
-          │
-          ▼ HTTPS / Vite + Vue.js 3 (SPA)
-[Frontend Cloud (Railway)]
-          │
-          ▼ REST API (Bearer Tokens / Sanctum)
-[Laravel 11 REST Engine]
-          │
-          ├──► [Auth & RBAC Middleware] (Admin / Seller / Customer)
-          ├──► [Escrow & Wallet Processor] (Retenção / Liberação de Saldo)
-          └──► [PostgreSQL Database] (Users, Profiles, Wallets, Products, Orders)`,
-    architecture: [
-      "Frontend: SPA reativa em Vue 3 (Composition API) com visualização dinâmica de catálogo, gaveta de checkout e modal unificado de controle administrativo",
-      "Backend: Laravel 11 estruturado em camadas de serviço, controllers RESTful e middleware customizado para validação de RBAC",
-      "Segurança e Identidade: Hash de senhas Bcrypt, validação de unicidade de e-mail/CPF e emissão de tokens de sessão persistente",
-      "Dados: Modelagem relacional no PostgreSQL com tabelas dedicadas a seller_profiles, seller_wallets e produtos moderados",
-      "Infraestrutura: Provisionamento isolado de microsserviços frontend e backend na nuvem Railway"
-    ],
-    codeSnippet: {
-      title: "Rotas de Moderação e Painel Administrativo",
-      language: "php",
-      code: "Route::middleware('api.auth')->group(function () {\n    Route::get('/admin/sellers/pending', function (Request $request) {\n        if ($request->user()->role !== 'ADMIN') {\n            return response()->json(['message' => 'Acesso negado.'], 403);\n        }\n        return User::where('role', 'SELLER')->where('is_approved', false)->latest()->get();\n    });\n\n    Route::post('/admin/sellers/{id}/approve', function (Request $request, $id) {\n        if ($request->user()->role !== 'ADMIN') {\n            return response()->json(['message' => 'Acesso negado.'], 403);\n        }\n        $seller = User::where('role', 'SELLER')->findOrFail($id);\n        $seller->is_approved = true;\n        $seller->save();\n        return response()->json(['message' => \"Vendedor {$seller->name} aprovado!\"]);\n    });\n});"
-    },
-    challenges: [
-      {
-        problem: "Garantir que lojistas recém-cadastrados não publiquem produtos na vitrine antes de passarem por aprovação documental e antifraude.",
-        solution: "Implementação de trava condicional na camada de cadastro e criação automática de registros vinculados em seller_profiles com status pendente, associado a middleware que valida a flag is_approved antes de liberar rotas de criação no catálogo."
-      },
-      {
-        problem: "Centralizar operações de perfis heterogêneos (Admin, Lojista e Comprador) mantendo a interface leve e responsiva.",
-        solution: "Desenvolvimento de modal de controle unificado com abas dinâmicas no Vue 3, carregando formulários de gestão de CPF, segurança, moderação e catálogo sob demanda conforme o perfil autenticado."
-      }
-    ]
-  },
-  {
     slug: "fintech-core-engine",
-    title: "Fintech Core Engine & Ledger",
-    category: "Sistemas Distribuídos & Engenharia Financeira",
+    title: "Fintech Core Engine (estudo em Go)",
+    category: "Estudo · Go, Concorrência & Transações",
     shortDescription: "Motor bancário experimental com livro-razão contábil por partidas dobradas, estratégia de ordenação de locks e telemetria Prometheus/Grafana.",
-    fullDescription: "Core bancário de missão crítica desenvolvido em Go, PostgreSQL e Redis. Projetado para garantir conservação estrita de capital, zero race conditions sob cargas concorrentes extremas, desacoplamento assíncrono via Transactional Outbox Pattern e observabilidade operacional em tempo real.",
-    tags: ["Go", "PostgreSQL", "Redis", "Docker", "Prometheus", "Grafana", "Distributed Systems"],
+    fullDescription: "Projeto de estudo que fiz para aprender Go aplicando conceitos de sistemas financeiros: partidas dobradas, idempotência, controle de concorrência e o padrão Transactional Outbox. Validado com uma suíte de estresse de 50 transferências simultâneas, em que a soma dos saldos se manteve exata no centavo. Próximos passos: ampliar os testes automatizados e medir a latência com k6.",
+    tags: ["Go", "PostgreSQL", "Redis", "Docker", "Prometheus", "Grafana"],
     github: "https://github.com/devraphaeldiniz/fintech-core-engine",
     highlights: [
-      "Livro-razão contábil por partidas dobradas (Double-Entry Bookkeeping) estritamente imutável",
-      "Snapshots de saldo com leituras em O(1) e liquidação atômica em milissegundos",
-      "Travas distribuídas com Spin-Lock e backoff no Redis combinadas a locks léxicos no Postgres para prevenção de deadlocks (AB-BA)",
+      "Livro-razão por partidas dobradas (double-entry), só com inserções",
+      "Tabela de saldo atualizada na mesma transação, sem precisar somar o histórico a cada consulta",
+      "Lock no Redis com retry e SELECT ... FOR UPDATE em ordem fixa de UUID no PostgreSQL para evitar deadlock entre transferências cruzadas",
       "Transactional Outbox Pattern desacoplando disparo de eventos sem risco de dual-write",
-      "Rotina autônoma de reconciliação contábil (Nightly Audit) comprovando balanços",
+      "Rotina de reconciliação que compara o saldo com a soma do livro-razão",
       "Tabela do ledger particionada mensalmente por RANGE no PostgreSQL com auto-provisionamento para 12 meses",
       "Telemetria nativa com métricas Prometheus (/metrics) e dashboard pré-provisionado no Grafana"
     ],
@@ -208,7 +157,6 @@ USING (
     fullDescription: "Aplicação full stack moderna que conecta o ecossistema educacional às capacidades de IA generativa do Google Gemini 2.5 Flash, gerando planos estruturados conforme diretrizes da Base Nacional Comum Curricular (BNCC).",
     tags: ["Next.js 14", "TypeScript", "Google Gemini API", "Tailwind CSS", "Zod", "Supabase"],
     github: "https://github.com/devraphaeldiniz/plano-aula-ia",
-    demo: "https://plano-aula-4i0xhojbb-raphaels-projects-004b90a9.vercel.app",
     highlights: [
       "Integração direta com Google Gemini 2.5 Flash via Server Actions",
       "Validação ponta a ponta com schemas Zod garantindo tipagem forte em runtime",
