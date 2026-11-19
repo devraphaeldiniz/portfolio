@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ExternalLink, ArrowRight, MessageCircle, FileText, User } from "lucide-react";
 import { projectsData } from "@/lib/projects";
@@ -21,8 +20,8 @@ const LinkedinIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 );
 
 const skills = [
-  { name: "TypeScript / JavaScript", category: "Linguagens" },
-  { name: "Go / PHP / Node.js", category: "Back-end" },
+  { name: "TypeScript / JavaScript / SQL", category: "Linguagens" },
+  { name: "Node.js / Express / Fastify", category: "Back-end" },
   { name: "Next.js / React / Tailwind", category: "Front-end" },
   { name: "PostgreSQL & Supabase", category: "Banco de Dados" },
   { name: "RLS, RBAC & 2FA", category: "Segurança" },
@@ -30,7 +29,7 @@ const skills = [
   { name: "Workers, Filas & APIs", category: "Engenharia" }
 ];
 
-const featuredSlugs = ["fintech-core-engine", "nexus-shop", "ecommerce-supabase", "nexus-commerce"];
+const featuredSlugs = ["nexus-shop", "ecommerce-supabase"];
 const featuredProjects = featuredSlugs
   .map((slug) => projectsData.find((project) => project.slug === slug))
   .filter((project): project is (typeof projectsData)[number] => Boolean(project));
@@ -40,7 +39,6 @@ const otherProjects = projectsData.filter(
 );
 
 export default function Home() {
-  const router = useRouter();
   const whatsappUrl = "https://wa.me/5531971611211?text=Ol%C3%A1%20Raphael,%20vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar!";
 
   return (
@@ -58,9 +56,24 @@ export default function Home() {
 
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-6 py-20 relative z-10">
+      <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur">
+        <nav aria-label="Navegação principal" className="max-w-6xl mx-auto flex items-center justify-between gap-4 px-6 py-3">
+          <a href="#inicio" className="font-semibold tracking-tight text-white">Raphael Diniz</a>
+          <div className="flex items-center gap-4 sm:gap-6 text-sm text-slate-300">
+            <a href="#astacar" className="hidden sm:inline hover:text-white transition-colors">AstaCar</a>
+            <a href="#projetos" className="hover:text-white transition-colors">Projetos</a>
+            <a href="#experiencia" className="hidden sm:inline hover:text-white transition-colors">Experiência</a>
+            <a href="#sobre" className="hidden sm:inline hover:text-white transition-colors">Sobre</a>
+            <a href="#contato" className="rounded-lg bg-blue-600 px-3 py-1.5 font-medium text-white hover:bg-blue-500 transition-colors">Contato</a>
+          </div>
+        </nav>
+      </header>
+
+      <div className="max-w-6xl mx-auto px-6 pt-16 pb-20 relative z-10">
         {/* Hero Section */}
-        <section className="space-y-6 pb-20 border-b border-slate-800">
+        <section id="inicio" className="scroll-mt-20 pb-20 border-b border-slate-800">
+          <div className="flex flex-col-reverse gap-10 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -93,9 +106,9 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xl sm:text-2xl text-slate-400 max-w-3xl font-light leading-relaxed"
+            className="text-lg sm:text-2xl text-slate-300 max-w-3xl leading-relaxed"
           >
-            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy e levo os projetos até produção: o AstaCar, minha locadora de carros, está no ar com pagamento online pelo Mercado Pago (em modo de teste) e 101 testes.
+            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy e levo os projetos até produção: o AstaCar, minha locadora de carros, está no ar, com integração ao Mercado Pago e 101 testes automatizados.
           </motion.p>
 
           <motion.div 
@@ -136,6 +149,16 @@ export default function Home() {
               <GithubIcon className="w-4 h-4" /> GitHub
             </a>
           </motion.div>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://avatars.githubusercontent.com/u/207482093?s=460&v=4"
+            alt="Foto de Raphael Diniz"
+            width={224}
+            height={224}
+            className="h-24 w-24 md:h-56 md:w-56 shrink-0 rounded-full border-2 border-slate-800 object-cover shadow-2xl shadow-blue-900/30"
+          />
+          </div>
         </section>
 
         {/* Projeto principal */}
@@ -160,32 +183,22 @@ export default function Home() {
         </section>
 
         {/* Projetos em Destaque */}
-        <section className="py-20 space-y-12 border-b border-slate-800">
+        <section id="projetos" className="scroll-mt-20 py-20 space-y-12 border-b border-slate-800">
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400">Projetos</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2">O que eu construí</h2>
-            <p className="text-slate-400 text-sm mt-2 max-w-2xl">Cada projeto aqui nasceu de um problema real. Pode abrir, clicar e testar: estão em produção ou com o código aberto no GitHub.</p>
+            <p className="text-slate-300 text-base mt-2 max-w-2xl">Cada projeto aqui nasceu de um problema real. Pode abrir, clicar e testar: estão em produção ou com o código aberto no GitHub.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {featuredProjects.map((proj, idx) => (
               <motion.div 
                 key={proj.slug}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                onClick={() => router.push(`/projetos/${proj.slug}`)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    router.push(`/projetos/${proj.slug}`);
-                  }
-                }}
-                role="link"
-                tabIndex={0}
-                aria-label={`Ver estudo de caso: ${proj.title}`}
-                className="flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all cursor-pointer group shadow-sm hover:shadow-lg hover:shadow-blue-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                transition={{ duration: 0.35, delay: idx * 0.05 }}
+                className="relative flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all group shadow-sm hover:shadow-lg hover:shadow-blue-500/5 focus-within:ring-2 focus-within:ring-blue-500"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-xs">
@@ -193,17 +206,19 @@ export default function Home() {
                   </div>
 
                   <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors flex items-center justify-between">
-                    <span>{proj.title}</span>
+                    <Link href={`/projetos/${proj.slug}`} className="after:absolute after:inset-0 after:rounded-2xl focus:outline-none">
+                      {proj.title}
+                    </Link>
                     <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
                   </h3>
 
-                  <p className="text-sm text-slate-300 leading-relaxed">
+                  <p className="text-base text-slate-300 leading-relaxed">
                     {proj.shortDescription}
                   </p>
 
                   <ul className="space-y-2 py-2 border-y border-slate-800/60 my-4">
                     {proj.highlights.slice(0, 3).map((highlight, hIdx) => (
-                      <li key={hIdx} className="text-xs text-slate-400 flex items-start gap-2">
+                      <li key={hIdx} className="text-sm text-slate-300 flex items-start gap-2">
                         <span className="text-blue-500 font-bold mt-0.5">•</span>
                         <span>{highlight}</span>
                       </li>
@@ -224,7 +239,7 @@ export default function Home() {
 
                 <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-800/60">
                   <span className="text-xs font-semibold text-blue-400 group-hover:underline">
-                    Ver Estudo de Caso & Código →
+                    Ver estudo de caso e código →
                   </span>
                   
                   {proj.demo && (
@@ -232,8 +247,7 @@ export default function Home() {
                       href={proj.demo} 
                       target="_blank" 
                       rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                      className="relative z-10 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
                     >
                       <ExternalLink className="w-3.5 h-3.5" /> Live Demo
                     </a>
@@ -247,14 +261,14 @@ export default function Home() {
             <div className="space-y-6 pt-8">
               <div>
                 <h3 className="text-xl font-bold text-white">Outros projetos</h3>
-                <p className="text-sm text-slate-400 mt-1">Explore também os demais repositórios e estudos de caso.</p>
+                <p className="text-sm text-slate-300 mt-1">Explore também os demais repositórios e estudos de caso.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {otherProjects.map((project) => (
                   <Link key={project.slug} href={`/projetos/${project.slug}`} className="group rounded-xl border border-slate-800 bg-slate-900/40 p-5 transition-all hover:-translate-y-1 hover:border-blue-500/50 hover:bg-slate-900/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
                     <span className="text-xs uppercase tracking-wider text-blue-400">{project.category}</span>
                     <h3 className="mt-2 font-semibold text-white group-hover:text-blue-400">{project.title}</h3>
-                    <p className="mt-2 text-xs leading-relaxed text-slate-400">{project.shortDescription}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-300">{project.shortDescription}</p>
                     <span className="mt-4 inline-block text-xs font-semibold text-blue-400">Ver estudo de caso →</span>
                   </Link>
                 ))}
@@ -264,22 +278,22 @@ export default function Home() {
         </section>
 
         {/* Experiência e atuação */}
-         <section className="py-20 space-y-10 border-b border-slate-800">
+         <section id="experiencia" className="scroll-mt-20 py-20 space-y-10 border-b border-slate-800">
            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Experiência</h2>
-           <p className="text-slate-300 leading-relaxed max-w-3xl">Comecei do lado da operação, automatizei o meu próprio trabalho e hoje desenvolvo em tempo integral. A trajetória completa está no LinkedIn.</p>
+           <p className="text-slate-300 leading-relaxed max-w-3xl">Comecei do lado da operação, automatizei o meu próprio trabalho e hoje me dedico a construir e manter projetos próprios em produção. A trajetória completa está no LinkedIn.</p>
            <div className="grid gap-4 md:grid-cols-3">
              {[
                ["2026 · atual", "AstaCar · Projeto autoral", "Plataforma de aluguel de carros em produção na Vercel: Mercado Pago, Hasura, prevenção de overbooking no PostgreSQL e 101 testes automatizados."],
                ["2022 a 2026", "Comprador · Rodoagro", "Único comprador da empresa. Automatizei o fluxo de cotações em JavaScript, integrado à API do ERP Omie, e reduzi em até 25% o custo de algumas máquinas."],
                ["2020 a 2022", "Coordenador de logística · JM Transportes", "Liderança operacional em um dos maiores hubs do Mercado Livre, com foco em prazos, SLAs e eliminação de gargalos."],
              ].map(([period, title, text]) => (
-               <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><span className="text-xs font-semibold uppercase tracking-wider text-blue-400">{period}</span><h3 className="mt-2 font-semibold text-white">{title}</h3><p className="mt-2 text-sm leading-relaxed text-slate-400">{text}</p></article>
+               <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><span className="text-xs font-semibold uppercase tracking-wider text-blue-400">{period}</span><h3 className="mt-2 font-semibold text-white">{title}</h3><p className="mt-2 text-sm leading-relaxed text-slate-300">{text}</p></article>
              ))}
            </div>
          </section>
 
          {/* Seção Sobre Mim */}
-        <section className="py-20 space-y-6 border-b border-slate-800">
+        <section id="sobre" className="scroll-mt-20 py-20 space-y-6 border-b border-slate-800">
           <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-blue-400">
             <User className="w-4 h-4" /> Sobre Mim
           </div>
@@ -306,7 +320,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="pt-12 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <footer id="contato" className="scroll-mt-20 pt-12 flex flex-col sm:flex-row items-center justify-between text-sm text-slate-400 gap-4">
           <p>© {new Date().getFullYear()} Raphael Diniz. Todos os direitos reservados.</p>
           <div className="flex gap-6">
             <a href="mailto:devraphaeldiniz@gmail.com" className="hover:text-blue-400 transition-colors">E-mail</a>
