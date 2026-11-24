@@ -32,8 +32,8 @@ export default function AstaCarSpotlight() {
   return (
     <section id="astacar" aria-labelledby="astacar-title" className="py-20 border-b border-slate-800 scroll-mt-20">
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ y: 12 }}
+        whileInView={{ y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.35 }}
         className="relative rounded-3xl p-px bg-gradient-to-br from-blue-500/70 via-cyan-400/30 to-slate-800"
