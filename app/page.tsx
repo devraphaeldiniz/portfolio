@@ -75,8 +75,8 @@ export default function Home() {
           <div className="flex flex-col-reverse gap-10 md:flex-row md:items-center md:justify-between">
           <div className="space-y-6">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium"
           >
@@ -85,8 +85,8 @@ export default function Home() {
           </motion.div>
           <motion.a
             href="#astacar"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.5, delay: 0.05 }}
             className="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/30 text-cyan-300 text-sm font-medium hover:bg-cyan-400/20 transition-colors"
           >
@@ -94,8 +94,8 @@ export default function Home() {
           </motion.a>
 
           <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight"
           >
@@ -103,8 +103,8 @@ export default function Home() {
           </motion.h1>
 
           <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg sm:text-2xl text-slate-300 max-w-3xl leading-relaxed"
           >
@@ -112,8 +112,8 @@ export default function Home() {
           </motion.p>
 
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-wrap gap-4 pt-4"
           >
@@ -194,8 +194,8 @@ export default function Home() {
             {featuredProjects.map((proj, idx) => (
               <motion.div 
                 key={proj.slug}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ y: 12 }}
+                whileInView={{ y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: idx * 0.05 }}
                 className="relative flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all group shadow-sm hover:shadow-lg hover:shadow-blue-500/5 focus-within:ring-2 focus-within:ring-blue-500"
