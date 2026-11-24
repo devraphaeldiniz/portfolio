@@ -52,44 +52,41 @@ export const projectsData: DetailedProject[] = [
               ├──► 3. Atualização atômica do snapshot de saldo O(1)
               └──► 4. Gravação do evento na tabela outbox_events
                              │
-                             ▼ Change Data Capture
-                     [Outbox Worker] ──► [Tópicos Assíncronos / Webhooks]`,
+                             ▼ leitura periódica (FOR UPDATE SKIP LOCKED)
+                     [Outbox Worker] ──► [Processamento dos eventos]`,
     architecture: [
-      "Linguagem & Runtime: Go 1.23+ com pgxpool (PostgreSQL nativo) e cliente Redis v9",
+      "Linguagem & Runtime: Go 1.25 com pgxpool (PostgreSQL nativo) e cliente Redis v9",
       "Isolamento Transacional: Lock pessimista léxico em nível SQL somado a Redis Mutex para contenção inicial",
       "Banco de Dados: PostgreSQL 16 com particionamento declarativo mensal por data (RANGE)",
       "Observabilidade: Instrumentação oficial do Prometheus coletando latência transacional (p95/p99) e vazão contábil"
     ],
     codeSnippet: {
-      title: "Transação Atômica com Ordenação Léxica Anti-Deadlock",
+      title: "internal/repository/ledger_repository.go: locks em ordem fixa (trecho)",
       language: "go",
-      code: `// Ordenação léxica dos UUIDs para prevenir deadlocks cíclicos (AB-BA)
+      code: `// Prevenção de Deadlock: ordenação léxica dos IDs para lock pessimista
 firstID, secondID := fromID, toID
-if firstID.String() > secondID.String() {
+if fromID.String() > toID.String() {
     firstID, secondID = toID, fromID
 }
 
-// Bloqueio pessimista sequencial no PostgreSQL
-if err := lockAccount(ctx, tx, firstID); err != nil {
+var dummy int
+err = tx.QueryRow(ctx, \`SELECT 1 FROM account_balances WHERE account_id = $1 FOR UPDATE\`, firstID).Scan(&dummy)
+if err != nil {
     return nil, err
 }
-if err := lockAccount(ctx, tx, secondID); err != nil {
+err = tx.QueryRow(ctx, \`SELECT 1 FROM account_balances WHERE account_id = $1 FOR UPDATE\`, secondID).Scan(&dummy)
+if err != nil {
     return nil, err
-}
-
-// Verificação de saldo, double-entry e snapshot na mesma transação ACID
-if currentBalance < amountCents {
-    return nil, domain.ErrInsufficientFunds
 }`
     },
     challenges: [
       {
-        problem: "Eliminar concorrência destrutiva e saldo negativo quando dezenas de transferências atingem a mesma conta no mesmo milissegundo.",
-        solution: "Estratégia híbrida de controle: Spin-lock adaptativo com jitter no Redis na entrada da requisição e bloqueio léxico FOR UPDATE no banco de dados, comprovado com 100% de consistência em testes de 50 requisições simultâneas."
+        problem: "Evitar saldo negativo quando dezenas de transferências simultâneas atingem a mesma conta.",
+        solution: "Spin-lock com jitter no Redis na entrada da requisição e SELECT ... FOR UPDATE em ordem fixa de UUID no banco, exercitado por um programa de estresse com 50 transferências simultâneas (cmd/stress)."
       },
       {
-        problem: "Degradação de performance em relatórios e auditorias com crescimento exponencial dos lançamentos contábeis.",
-        solution: "Implementação de tabela mãe particionada por intervalo de datas (RANGE mensal) com rotina de manutenção contínua que provisiona automaticamente os próximos 12 meses."
+        problem: "Evitar que a tabela de lançamentos cresça sem limite numa partição só.",
+        solution: "Tabela particionada por mês (RANGE), com um worker que cria as partições dos meses seguintes."
       }
     ]
   },
@@ -98,15 +95,15 @@ if currentBalance < amountCents {
     title: "E-commerce Backend & Infra",
     category: "Back-end & Arquitetura de Dados",
     shortDescription: "Banco e APIs de um e-commerce com Row-Level Security em todas as tabelas, 4 papéis de acesso, triggers de auditoria e 27 testes automatizados.",
-    fullDescription: "Solução de infraestrutura completa para comércio eletrônico utilizando PostgreSQL e Supabase. Projetado para alta integridade relacional, isolamento de privilégios e auditoria em tempo real.",
-    tags: ["PostgreSQL", "Supabase", "Row Level Security", "RBAC", "Docker", "CI/CD"],
+    fullDescription: "Banco de um e-commerce feito como desafio técnico para uma vaga de backend, com PostgreSQL e Supabase: regras de acesso no próprio banco, triggers de auditoria, views para relatórios e Edge Functions.",
+    tags: ["PostgreSQL", "Supabase", "Row Level Security", "RBAC", "Edge Functions", "GitHub Actions"],
     github: "https://github.com/devraphaeldiniz/ecommerce-supabase",
     highlights: [
-      "Controle de acesso granular (RBAC) em 4 níveis estritos",
-      "Row Level Security ativado em todas as tabelas, com políticas por papel",
-      "35+ índices estratégicos (B-Tree, GIN) para otimização de queries",
-      "6 views operacionais e 3 materialized views para agregação contínua",
-      "27 testes automatizados cobrindo segurança, integridade e concorrência"
+      "Controle de acesso (RBAC) com 4 papéis: cliente, staff, admin e super admin",
+      "Row Level Security ativado nas 8 tabelas, com políticas por papel",
+      "Índices B-Tree e GIN para as consultas mais usadas",
+      "14 views e 3 materialized views para relatórios",
+      "27 testes automatizados de integração, que rodam com um projeto Supabase configurado"
     ],
     architectureDiagram: `[Client Request]
        │
@@ -121,34 +118,28 @@ if currentBalance < amountCents {
        ├──► [RBAC Role Verification]
        └──► [Triggers: Audit Logs & Materialized Views]`,
     architecture: [
-      "Database: PostgreSQL com schemas isolados e triggers de auditoria",
-      "Segurança: Políticas RLS vinculadas a claims do JWT para isolamento por tenant/usuário",
-      "Pipeline: GitHub Actions validando migrações SQL e suíte de testes de integridade"
+      "Banco: PostgreSQL com migrations versionadas e triggers de auditoria",
+      "Segurança: políticas RLS que usam auth.uid() para separar os dados de cada usuário",
+      "CI: GitHub Actions instala as dependências e procura segredos com Gitleaks"
     ],
     codeSnippet: {
-      title: "Política RLS Granular com Validação RBAC",
+      title: "supabase/migrations: políticas RLS de pedidos (trecho)",
       language: "sql",
-      code: `CREATE POLICY "admin_and_staff_access_orders"
-ON orders
-FOR ALL
-TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM user_roles
-    WHERE user_roles.user_id = auth.uid()
-      AND user_roles.role IN ('admin', 'staff')
-  )
-  OR auth.uid() = customer_id
-);`
+      code: `CREATE POLICY "orders_select_own" ON orders
+    FOR SELECT USING (customer_id IN (SELECT id FROM profiles WHERE auth_uid = auth.uid()));
+
+CREATE POLICY "admin_orders_select_all" ON orders
+    FOR SELECT TO authenticated
+    USING (is_staff_or_admin());`
     },
     challenges: [
       {
-        problem: "Garantir isolamento total de dados entre clientes e operadores no acesso direto ao banco via PostgREST.",
-        solution: "Configuração de Row Level Security (RLS) restritiva combinando checagens de roles e tokens autenticados."
+        problem: "Fazer cada cliente ver só os próprios pedidos, mesmo acessando o banco direto pela API do Supabase.",
+        solution: "Row Level Security com políticas por dono do pedido e por papel, definidas no próprio banco."
       },
       {
-        problem: "Lentidão nas consultas de relatórios operacionais consolidados.",
-        solution: "Criação de Materialized Views com rotina de atualização assíncrona para cálculos pesados de RFM e receita."
+        problem: "Evitar recalcular a cada consulta os relatórios de vendas e de segmentação de clientes (RFM).",
+        solution: "Materialized views, com uma função que atualiza as três."
       }
     ]
   },
@@ -157,17 +148,17 @@ USING (
     title: "Gerador de Planos de Aula com IA",
     category: "Full Stack & IA Generativa",
     shortDescription: "Gera planos de aula alinhados à BNCC com a API do Gemini. A resposta do modelo passa por validação de esquema com Zod antes de chegar ao professor.",
-    fullDescription: "Aplicação full stack moderna que conecta o ecossistema educacional às capacidades de IA generativa do Google Gemini 2.5 Flash, gerando planos estruturados conforme diretrizes da Base Nacional Comum Curricular (BNCC).",
-    tags: ["Next.js 14", "TypeScript", "Google Gemini API", "Tailwind CSS", "Zod", "Supabase"],
+    fullDescription: "Aplicação full stack que usa o Google Gemini 2.5 Flash para gerar planos de aula estruturados, com base nos objetivos da BNCC informados no formulário.",
+    tags: ["Next.js 15", "TypeScript", "Google Gemini API", "Tailwind CSS", "Zod", "Supabase"],
     github: "https://github.com/devraphaeldiniz/plano-aula-ia",
     highlights: [
-      "Integração direta com Google Gemini 2.5 Flash via Server Actions",
-      "Validação ponta a ponta com schemas Zod garantindo tipagem forte em runtime",
-      "Estratégia de retries automatizados com ajuste adaptativo de temperatura",
-      "Persistência estruturada em PostgreSQL com suporte a campos JSONB",
-      "Interface responsiva e minimalista construída com Tailwind CSS"
+      "Chamada à API do Google Gemini 2.5 Flash em uma rota do Next.js",
+      "Entrada e resposta validadas com Zod",
+      "Uma nova tentativa com temperatura menor quando a resposta não é um JSON válido",
+      "Plano salvo no Supabase (PostgreSQL) em colunas JSONB",
+      "Interface com Tailwind CSS"
     ],
-    architectureDiagram: `[Next.js Client] ──► [Server Action] ──► [Zod Input Validation]
+    architectureDiagram: `[Next.js Client] ──► [Route Handler] ──► [Zod Input Validation]
                                                │
                                                ▼
                                       [Gemini 2.5 Flash API]
@@ -175,50 +166,45 @@ USING (
                                                ▼
 [PostgreSQL Database] ◄── [Safe Parsing] ◄── [Response Normalizer]`,
     architecture: [
-      "Frontend: Next.js 14 (App Router) com React Hook Form",
-      "Validação: Zod garantindo imunidade a payloads malformados ou incompletos da LLM",
-      "Serviço de IA: SDK Gemini com pipeline de sanitização de blocos markdown e regex"
+      "Frontend: Next.js 15 (App Router) e React 19",
+      "Validação: Zod recusa respostas do modelo fora da estrutura esperada",
+      "Serviço de IA: API REST do Gemini, com remoção das marcas de markdown antes do JSON.parse"
     ],
     codeSnippet: {
-      title: "Pipeline de Validação e Sanitização de LLM com Zod",
+      title: "lib/gemini.ts: nova tentativa e validação (trecho)",
       language: "typescript",
-      code: `const PlanSchema = z.object({
-  tema: z.string().min(3),
-  habilidadesBNCC: z.array(z.string()),
-  metodologia: z.string().min(20),
-  recursos: z.array(z.string())
-});
+      code: `try {
+  text = await callGemini(prompt);
+  text = cleanJsonResponse(text);
+  parsed = JSON.parse(text);
+} catch (error) {
+  text = await callGemini(prompt, true);
+  text = cleanJsonResponse(text);
+  parsed = JSON.parse(text);
+}
 
-export async function parseGeminiResponse(rawText: string) {
-  const sanitized = rawText.replace(/\`\`\`json|\`\`\`/g, "").trim();
-  const parsedJson = JSON.parse(sanitized);
-  return PlanSchema.parse(parsedJson);
-}`
+return PlanoAulaOutputSchema.parse(parsed);`
     },
     challenges: [
       {
-        problem: "Variação na estrutura JSON devolvida pelo modelo de linguagem em requisições consecutivas.",
-        solution: "Criação de parser intermediário com sanitização de formatação e fallback automático com temperatura restritiva."
-      },
-      {
-        problem: "Falhas de tipagem estrita no processo de build em produção.",
-        solution: "Refatoração dos blocos de captura de erro do Zod para runtime typesafe defensivo."
+        problem: "O modelo nem sempre devolve um JSON válido.",
+        solution: "Limpeza das marcas de markdown e, se o JSON falhar, uma segunda chamada com instrução mais rígida e temperatura menor (0,3). A resposta final ainda passa pelo Zod."
       }
     ]
   },
   {
     slug: "rentalcar",
     title: "AstaCar — Locadora de Veículos",
-    category: "Produto Full Stack em Produção",
+    category: "Projeto Full Stack no ar",
     shortDescription: "Locadora completa no ar: reserva com preço calculado no servidor, pagamento pelo Mercado Pago, CNH conferida, contrato em PDF, vistoria na retirada e na devolução e painel admin com agenda, funil e monitoramento. Dá para testar como cliente ou como admin, sem cadastro.",
-    fullDescription: "O AstaCar é uma aplicação real de locação de veículos, publicada na Vercel e pensada como produto: o cliente escolhe o carro, monta a reserva com proteções e opcionais e vê exatamente quanto vai pagar; o time interno acompanha a frota, ajusta preços por temporada, cria cupons e mede onde os clientes desistem do funil. Todo valor é recalculado no servidor, o banco impede reservas sobrepostas e bloqueios de manutenção, a CNH é conferida antes da reserva e a vistoria registra km, combustível e avarias. Quem visita o portfólio entra como cliente ou no painel do admin em modo demonstração, só leitura e com os dados pessoais mascarados.",
+    fullDescription: "O AstaCar é um projeto autoral de locação de veículos, publicado na Vercel e pensado como produto, com reservas de demonstração e pagamento em modo de teste: o cliente escolhe o carro, monta a reserva com proteções e opcionais e vê exatamente quanto vai pagar; o admin acompanha a frota, ajusta preços por temporada, cria cupons e mede onde os clientes desistem do funil. Todo valor é recalculado no servidor, o banco impede reservas sobrepostas e bloqueios de manutenção, a CNH é conferida antes da reserva e a vistoria registra km, combustível e avarias. Quem visita o portfólio entra como cliente ou no painel do admin em modo demonstração, só leitura e com os dados pessoais mascarados.",
     tags: ["Next.js 15", "TypeScript", "Nhost", "Hasura GraphQL", "PostgreSQL", "Mercado Pago", "Tailwind", "Zod", "Vitest", "Playwright", "Vercel"],
     github: "https://github.com/devraphaeldiniz/rentalcar",
     demo: "https://rentalcar-eight.vercel.app",
     cover: "/projetos/astacar/01-home.jpg",
     metrics: [
       { value: "34", label: "carros na frota" },
-      { value: "101", label: "testes + E2E no CI" },
+      { value: "105", label: "testes de unidade + E2E" },
       { value: "100", label: "Lighthouse (acessib. e SEO)" },
       { value: "0", label: "vulnerabilidades (npm audit)" }
     ],
@@ -241,13 +227,13 @@ export async function parseGeminiResponse(rawText: string) {
       "Funil de conversão próprio (busca → veículo → checkout → reserva) com consentimento LGPD, cookies httpOnly e sem guardar IP",
       "Bloqueio de carro para manutenção e vistoria com km, combustível e avarias: gatilhos no PostgreSQL recusam reserva em período bloqueado e devolução com km menor",
       "CNH conferida no servidor antes de cada reserva (dígitos verificadores, categoria, validade na retirada e 2 anos de habilitação)",
-      "Pagamento online com Mercado Pago (Payment Brick) e webhook com assinatura validada; estorno automático ao cancelar",
+      "Pagamento online com Mercado Pago (Payment Brick, em modo de teste) e webhook com assinatura validada; estorno automático ao cancelar",
       "Painel admin com agenda da frota, gestão de preços e cupons, banners, contrato em PDF, avaliações e trilha de auditoria",
       "Painel em modo demonstração para recrutadores: só leitura por construção e com nomes, e-mails, telefones e CPFs mascarados",
       "Monitoramento próprio: erros do servidor (instrumentation.ts) e do navegador agrupados no painel, sem dados pessoais, e /api/health",
       "Sessão em cookies httpOnly, rate limit nas rotas sensíveis, CSP e validação de entrada com Zod",
       "SEO: páginas por categoria, sitemap, robots e imagem Open Graph gerada dinamicamente",
-      "101 testes com Vitest, testes de ponta a ponta com Playwright a cada deploy, Lighthouse 100 em acessibilidade e SEO e 0 vulnerabilidades no npm audit"
+      "105 testes de unidade com Vitest, testes de ponta a ponta com Playwright a cada deploy, Lighthouse 100 em acessibilidade e SEO e 0 vulnerabilidades no npm audit"
     ],
     architectureDiagram: `[Navegador] ──► [Next.js 15 App Router · Vercel]
                      │
@@ -322,18 +308,18 @@ export async function parseGeminiResponse(rawText: string) {
     slug: "whatsapp-disparador",
     title: "WhatsApp Disparador & Worker",
     category: "Back-end & Processamento Assíncrono",
-    shortDescription: "Disparador de mensagens com fila persistida em SQLite e worker contínuo: se o processo cair, nenhuma mensagem se perde.",
-    fullDescription: "Motor de mensageria assíncrono para envios em escala. Toda a lógica de filas opera de forma desacoplada do ciclo de vida das rotas HTTP, suportando reinicializações sem perda de tarefas.",
+    shortDescription: "Disparador de mensagens com fila salva em SQLite e worker contínuo: se o processo cair, o que estava pendente continua na fila e é retomado ao reiniciar.",
+    fullDescription: "Disparador de mensagens em Node.js e Express. A rota só grava na fila; um worker separado envia as mensagens no horário agendado, com até 3 tentativas por mensagem.",
     tags: ["Node.js", "Express", "SQLite", "Workers", "WPPConnect", "REST API"],
     github: "https://github.com/devraphaeldiniz/whatsapp-disparador",
     highlights: [
-      "Fila assíncrona 100% persistida em disco através de SQLite",
-      "Worker em background desacoplado da camada de controllers da API",
-      "Algoritmo de concorrência com jitter aleatório para prevenção de bans",
-      "Mecanismo automático de retentativas para mensagens rejeitadas",
-      "Modo mock nativo para baterias de testes em ambientes de CI"
+      "Fila gravada em disco com SQLite",
+      "Worker em segundo plano, separado das rotas da API",
+      "Intervalo aleatório entre os envios",
+      "Até 3 tentativas por mensagem, com 60 segundos entre elas; depois disso, fica marcada como falha",
+      "Modo mock, que simula os envios e 5% de falhas"
     ],
-    architectureDiagram: `[HTTP Requests] ──► [Express Controller] ──► [Insert Job: PENDING]
+    architectureDiagram: `[HTTP Requests] ──► [Express Controller] ──► [Insert: pendente]
                                                         │
                                                         ▼
                                               [SQLite Queue Table]
@@ -346,55 +332,58 @@ export async function parseGeminiResponse(rawText: string) {
                                               [WPPConnect WhatsApp API]`,
     architecture: [
       "Backend: Node.js e Express expondo rotas REST",
-      "Banco: SQLite com driver nativo operando em transações atômicas",
-      "Fila: Scheduler baseado em timestamps e estados ('pending', 'processing', 'completed')"
+      "Banco: SQLite, com os envios de uma campanha agendados em uma transação",
+      "Fila: horário agendado e estados 'pendente', 'enviado' e 'falhou'"
     ],
     codeSnippet: {
-      title: "Worker Contínuo com Transação Atômica",
-      language: "typescript",
-      code: `async function processNextJob() {
-  const job = db.prepare(\`
-    UPDATE queue 
-    SET status = 'processing', updated_at = ? 
-    WHERE id = (SELECT id FROM queue WHERE status = 'pending' LIMIT 1)
-    RETURNING *
-  \`).get(Date.now());
+      title: "src/workers/messageWorker.js: processamento da fila (trecho)",
+      language: "javascript",
+      code: `const itens = buscarPendentes(5);
 
-  if (!job) return;
-  await dispatchMessage(job);
+for (const item of itens) {
+  try {
+    // Envia via WhatsApp (real ou mock)
+    await sendMessage(item.telefone, item.mensagem);
+
+    // Marca como enviado no banco — persiste o resultado
+    marcarComoEnviado(item.id);
+  } catch (err) {
+    // Em caso de falha, incrementa tentativas e reagenda ou marca como falhou
+    marcarComoErro(item.id, err.message, item.tentativas);
+  }
 }`
     },
     challenges: [
       {
-        problem: "Garantir integridade da fila de envios mesmo se o container cair.",
-        solution: "Toda alteração de estado é persistida atomicamente no SQLite, permitindo retomada imediata pós-crash."
+        problem: "Não perder os envios pendentes se o processo cair.",
+        solution: "A fila fica no SQLite, então o worker volta a buscar os pendentes ao reiniciar. Limite conhecido: se a queda acontecer entre o envio e a gravação, a mensagem pode ser enviada de novo."
       },
       {
-        problem: "Evitar bloqueios na plataforma de mensageria provocados por envios rítmicos.",
-        solution: "Algoritmo de cálculo de delay não linear e distribuição randômica de intervalos."
+        problem: "Evitar que todas as mensagens saiam no mesmo instante.",
+        solution: "Cada contato recebe um intervalo aleatório, somado ao anterior, e o worker processa no máximo 5 mensagens por ciclo."
       }
     ]
   },
   {
     slug: "jitterbit-orders-api",
     title: "Jitterbit Orders API",
-    category: "Integrações & APIs Empresariais",
-    shortDescription: "API que recebe, valida e sincroniza pedidos entre sistemas, integrada ao Supabase.",
-    fullDescription: "Serviço focado na integração de pedidos, com contratos HTTP claros, validação de payloads e processamento orientado a confiabilidade para conectar sistemas distintos.",
-    tags: ["JavaScript", "Node.js", "REST API", "Integrações"],
+    category: "Teste técnico · API REST",
+    shortDescription: "API REST de pedidos feita como teste técnico: CRUD de pedidos e itens com JWT, validação com Zod e Supabase.",
+    fullDescription: "API REST de gerenciamento de pedidos feita como teste técnico para uma vaga de backend. Recebe o pedido, valida, converte para o formato do banco e salva no Supabase (PostgreSQL).",
+    tags: ["JavaScript", "Node.js", "Express", "Zod", "JWT", "Swagger", "Supabase"],
     github: "https://github.com/devraphaeldiniz/jitterbit-orders-api",
-    highlights: ["Integração de pedidos entre plataformas", "Contratos REST para comunicação entre sistemas", "Tratamento de erros e respostas previsíveis"],
-    architectureDiagram: `[Cliente / Sistema Origem] ──► [Orders API] ──► [Validação e Regras] ──► [Sistema Destino]`,
-    architecture: ["API REST para integração de pedidos", "Camada de validação e normalização de dados", "Fluxo preparado para observabilidade e retentativas"],
-    codeSnippet: { title: "Endpoint de pedidos", language: "javascript", code: `app.post(\"/orders\", async (req, res) => {\n  const order = validateOrder(req.body);\n  const result = await processOrder(order);\n  return res.status(201).json(result);\n});` },
-    challenges: [{ problem: "Manter consistência ao integrar payloads de origens diferentes.", solution: "Normalização e validação antes do processamento do pedido." }]
+    highlights: ["CRUD de pedidos e itens", "Autenticação JWT e rate limiting", "Validação com Zod e middleware de erros", "Documentação com Swagger e logs com Morgan e Winston"],
+    architectureDiagram: `[Cliente] ──► [Express + JWT] ──► [Validação Zod] ──► [Controller] ──► [Supabase (PostgreSQL)]`,
+    architecture: ["Rotas, controllers, middlewares e validators separados", "Validação com Zod antes do controller", "Conversão do JSON recebido para o formato do banco"],
+    codeSnippet: { title: "src/middleware/validate.js", language: "javascript", code: `module.exports = (schema) => (req, res, next) => {\n  try {\n    req.body = schema.parse(req.body);\n    next();\n  } catch (err) {\n    return res.status(400).json({\n      message: "Erro de validação",\n      errors: err.errors\n    });\n  }\n};` },
+    challenges: [{ problem: "Receber um JSON com nomes de campos diferentes dos usados no banco.", solution: "Validação com Zod e uma função que converte o pedido para o formato das tabelas." }]
   },
   {
     slug: "nexus-shop",
     title: "Nexus Shop — E-commerce de Smartphones",
     category: "E-commerce & Segurança de Aplicações",
     shortDescription: "E-commerce de smartphones com checkout via Stripe e Mercado Pago, JWT com refresh token rotativo e frontend separado da API.",
-    fullDescription: "Plataforma de e-commerce especializada em smartphones, construída com Next.js e TypeScript no frontend, Fastify e Prisma no backend, PostgreSQL para dados relacionais e Redis para cache e sessões. O projeto combina pagamentos com Stripe e Mercado Pago, autenticação com tokens rotativos e práticas de segurança para uma operação de comércio digital.",
+    fullDescription: "Plataforma de e-commerce especializada em smartphones, construída com Next.js e TypeScript no frontend, Fastify e Prisma no backend, PostgreSQL para dados relacionais e Redis para cache e sessões. O projeto integra Stripe e Mercado Pago (sem chaves reais na demonstração) e autenticação com tokens rotativos.",
     tags: ["Next.js", "TypeScript", "Fastify", "Prisma", "PostgreSQL", "Redis", "Stripe", "Mercado Pago", "Docker"],
     github: "https://github.com/devraphaeldiniz/nexus-shop",
     demo: "https://nexus-shop-raphaeldiniz.vercel.app",
@@ -408,7 +397,7 @@ export async function parseGeminiResponse(rawText: string) {
                                     │
                          [Stripe / Mercado Pago]`,
     architecture: ["Frontend: Next.js App Router, TypeScript, Tailwind, Zustand e componentes acessíveis", "Backend: Fastify com Prisma, autenticação JWT e documentação de API", "Dados: PostgreSQL para catálogo e pedidos, Redis para cache e sessões", "Operação: Docker Compose e pipeline de CI/CD com testes automatizados"],
-    codeSnippet: { title: "Validação de pedido com Zod", language: "typescript", code: `const OrderSchema = z.object({\n  items: z.array(z.object({\n    productId: z.string().uuid(),\n    quantity: z.number().int().positive(),\n  })).min(1),\n  paymentMethod: z.enum([\"stripe\", \"mercado_pago\"]),\n});` },
-    challenges: [{ problem: "Integrar pagamentos diferentes sem acoplar o checkout a um único provedor.", solution: "Separação da regra de pedido da implementação dos gateways, com contratos comuns para criação e confirmação de pagamentos." }, { problem: "Proteger operações sensíveis de autenticação e checkout.", solution: "Combinação de validação de entrada, rate limiting, CSRF, headers de segurança e rotação de refresh tokens." }]
+    codeSnippet: { title: "orders.routes.ts: validação do pedido com Zod (trecho)", language: "typescript", code: `items: z\n  .array(\n    z.object({\n      productId: z.string().min(1),\n      quantity: z.number().int().positive().max(20),\n      color: z.string().max(50).optional(),\n      storage: z.string().max(50).optional(),\n    })\n  )\n  .min(1, 'O carrinho está vazio')\n  .max(50),` },
+    challenges: [{ problem: "Integrar pagamentos diferentes sem acoplar o checkout a um único provedor.", solution: "Separação da regra de pedido da implementação dos gateways, com contratos comuns para criação e confirmação de pagamentos." }, { problem: "Proteger operações sensíveis de autenticação e checkout.", solution: "Combinação de validação de entrada, rate limiting, headers de segurança e rotação de refresh tokens." }]
   }
 ];
