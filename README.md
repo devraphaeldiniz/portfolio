@@ -4,7 +4,7 @@ Site pessoal publicado em **[devraphaeldiniz.com.br](https://www.devraphaeldiniz
 
 ## O que tem no site
 
-- **AstaCar em destaque**: locadora de veículos em produção ([demo](https://rentalcar-eight.vercel.app) · [código](https://github.com/devraphaeldiniz/rentalcar)), com métricas de testes, Lighthouse e segurança.
+- **AstaCar em destaque**: locadora de veículos no ar ([demo](https://rentalcar-eight.vercel.app) · [código](https://github.com/devraphaeldiniz/rentalcar)), com métricas de testes, Lighthouse e segurança.
 - **Projetos**: Nexus Shop, E-commerce Backend com Supabase, Fintech Core Engine, Gerador de Planos de Aula com IA, WhatsApp Disparador e Jitterbit Orders API.
 - **Experiência e Sobre mim**: a transição de compras e logística para o desenvolvimento.
 - **Contato**: WhatsApp, e-mail, LinkedIn e currículo em PDF.

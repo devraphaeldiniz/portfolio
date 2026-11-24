@@ -24,7 +24,7 @@ const skills = [
   { name: "Node.js / Express / Fastify", category: "Back-end" },
   { name: "Next.js / React / Tailwind", category: "Front-end" },
   { name: "PostgreSQL & Supabase", category: "Banco de Dados" },
-  { name: "RLS, RBAC & 2FA", category: "Segurança" },
+  { name: "RLS, RBAC & JWT", category: "Segurança" },
   { name: "Docker & CI/CD", category: "DevOps" },
   { name: "Workers, Filas & APIs", category: "Engenharia" }
 ];
@@ -108,7 +108,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg sm:text-2xl text-slate-300 max-w-3xl leading-relaxed"
           >
-            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy e levo os projetos até produção: o AstaCar, minha locadora de carros, está no ar, com integração ao Mercado Pago e 101 testes automatizados.
+            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy: o AstaCar, meu projeto de locadora de carros, está no ar, com Mercado Pago em modo de teste e 105 testes de unidade.
           </motion.p>
 
           <motion.div 
@@ -187,7 +187,7 @@ export default function Home() {
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400">Projetos</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2">O que eu construí</h2>
-            <p className="text-slate-300 text-base mt-2 max-w-2xl">Cada projeto aqui nasceu de um problema real. Pode abrir, clicar e testar: estão em produção ou com o código aberto no GitHub.</p>
+            <p className="text-slate-300 text-base mt-2 max-w-2xl">Projetos autorais, desafios técnicos de vagas e estudos. Todos têm o código aberto no GitHub, e o AstaCar e o Nexus Shop têm demonstração no ar.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -280,10 +280,10 @@ export default function Home() {
         {/* Experiência e atuação */}
          <section id="experiencia" className="scroll-mt-20 py-20 space-y-10 border-b border-slate-800">
            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Experiência</h2>
-           <p className="text-slate-300 leading-relaxed max-w-3xl">Comecei do lado da operação, automatizei o meu próprio trabalho e hoje me dedico a construir e manter projetos próprios em produção. A trajetória completa está no LinkedIn.</p>
+           <p className="text-slate-300 leading-relaxed max-w-3xl">Comecei do lado da operação, automatizei o meu próprio trabalho e hoje me dedico a construir e manter projetos próprios. A trajetória completa está no LinkedIn.</p>
            <div className="grid gap-4 md:grid-cols-3">
              {[
-               ["2026 · atual", "AstaCar · Projeto autoral", "Plataforma de aluguel de carros em produção na Vercel: Mercado Pago, Hasura, prevenção de overbooking no PostgreSQL e 101 testes automatizados."],
+               ["2026 · atual", "AstaCar · Projeto autoral", "Plataforma de aluguel de carros no ar na Vercel: Mercado Pago em modo de teste, Hasura, prevenção de overbooking no PostgreSQL e 105 testes de unidade."],
                ["2022 a 2026", "Comprador · Rodoagro", "Único comprador da empresa. Automatizei o fluxo de cotações em JavaScript, integrado à API do ERP Omie, e reduzi em até 25% o custo de algumas máquinas."],
                ["2020 a 2022", "Coordenador de logística · JM Transportes", "Liderança operacional em um dos maiores hubs do Mercado Livre, com foco em prazos, SLAs e eliminação de gargalos."],
              ].map(([period, title, text]) => (

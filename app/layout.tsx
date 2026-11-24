@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | Raphael Diniz",
   },
   description:
-    "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack com Node.js, TypeScript e PostgreSQL. Criador do AstaCar, plataforma de aluguel de carros em produção.",
+    "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack com Node.js, TypeScript e PostgreSQL. Criador do AstaCar, plataforma de aluguel de carros no ar.",
   keywords: [
     "Raphael Diniz",
     "desenvolvedor backend júnior",
@@ -43,12 +43,12 @@ export const metadata: Metadata = {
     siteName: "Raphael Diniz",
     title: "Raphael Diniz | Desenvolvedor Backend/Fullstack",
     description:
-      "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack com Node.js, TypeScript e PostgreSQL. Criador do AstaCar, plataforma de aluguel de carros em produção.",
+      "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack com Node.js, TypeScript e PostgreSQL. Criador do AstaCar, plataforma de aluguel de carros no ar.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Raphael Diniz | Desenvolvedor Backend/Fullstack",
-    description: "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack. Criador do AstaCar, plataforma de aluguel de carros em produção.",
+    description: "Portfólio de Raphael Diniz, desenvolvedor backend/fullstack. Criador do AstaCar, plataforma de aluguel de carros no ar.",
   },
   robots: { index: true, follow: true },
   icons: { icon: "/favicon.ico" },

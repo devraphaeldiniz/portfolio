@@ -64,7 +64,7 @@ export default function AstaCarSpotlight() {
               </div>
 
               <p className="text-base text-slate-300 leading-relaxed">
-                Um produto completo e publicado: o cliente reserva com proteções, opcionais e cupom, paga online e vê cada centavo do preço;
+                Um produto completo e publicado: o cliente reserva com proteções, opcionais e cupom, paga online (em modo de teste) e vê cada centavo do preço;
                 o admin gerencia frota, temporadas, vistorias e bloqueios de manutenção e acompanha o funil e os erros do site.
               </p>
 
