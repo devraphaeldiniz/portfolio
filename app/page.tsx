@@ -285,7 +285,7 @@ export default function Home() {
              {[
                ["2026 · atual", "AstaCar · Projeto autoral", "Plataforma de aluguel de carros no ar na Vercel: Mercado Pago em modo de teste, Hasura, prevenção de overbooking no PostgreSQL e 105 testes de unidade."],
                ["2022 a 2026", "Comprador · Rodoagro", "Único comprador da empresa. Automatizei o fluxo de cotações em JavaScript, integrado à API do ERP Omie, e reduzi em até 25% o custo de algumas máquinas."],
-               ["2020 a 2022", "Coordenador de logística · JM Transportes", "Liderança operacional em um dos maiores hubs do Mercado Livre, com foco em prazos, SLAs e eliminação de gargalos."],
+               ["2020 a 2022", "Coordenador de logística · JM Gestão de Transfer", "Liderança operacional em um dos maiores hubs do Mercado Livre, com foco em prazos, SLAs e eliminação de gargalos."],
              ].map(([period, title, text]) => (
                <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><span className="text-xs font-semibold uppercase tracking-wider text-blue-400">{period}</span><h3 className="mt-2 font-semibold text-white">{title}</h3><p className="mt-2 text-sm leading-relaxed text-slate-300">{text}</p></article>
              ))}
