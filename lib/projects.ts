@@ -399,5 +399,102 @@ for (const item of itens) {
     architecture: ["Frontend: Next.js App Router, TypeScript, Tailwind, Zustand e componentes acessíveis", "Backend: Fastify com Prisma, autenticação JWT e documentação de API", "Dados: PostgreSQL para catálogo e pedidos, Redis para cache e sessões", "Operação: Docker Compose e pipeline de CI/CD com testes automatizados"],
     codeSnippet: { title: "orders.routes.ts: validação do pedido com Zod (trecho)", language: "typescript", code: `items: z\n  .array(\n    z.object({\n      productId: z.string().min(1),\n      quantity: z.number().int().positive().max(20),\n      color: z.string().max(50).optional(),\n      storage: z.string().max(50).optional(),\n    })\n  )\n  .min(1, 'O carrinho está vazio')\n  .max(50),` },
     challenges: [{ problem: "Integrar pagamentos diferentes sem acoplar o checkout a um único provedor.", solution: "Separação da regra de pedido da implementação dos gateways, com contratos comuns para criação e confirmação de pagamentos." }, { problem: "Proteger operações sensíveis de autenticação e checkout.", solution: "Combinação de validação de entrada, rate limiting, headers de segurança e rotação de refresh tokens." }]
+  },
+  {
+    slug: "gestao-compras-cotacoes",
+    title: "Gestão de Compras e Cotações (Java + Spring Boot)",
+    category: "Back-end Java · Projeto no ar",
+    shortDescription: "API REST em Java 21 e Spring Boot 4 que automatiza a compra de reposição: o estoque mínimo abre a cotação, os fornecedores são convidados por e-mail, o aprovador decide entre 3+ propostas com dois critérios objetivos e o recebimento atualiza o custo médio.",
+    fullDescription: "Nasceu da minha experiência como único comprador de uma empresa: cotação em planilha e e-mail, item que acaba sem ninguém perceber, escolha que não fica registrada. O sistema transforma esse processo em regras explícitas e auditáveis. O produto que chega ao estoque mínimo entra sozinho num rascunho de cotação; os fornecedores convidados recebem e-mail e mandam preço por item; a decisão só é liberada com 3 propostas válidas e é feita por um aprovador (quem cota não decide); escolher outra proposta além da recomendada exige justificativa; o recebimento pode ser parcial e recalcula o custo médio com frete e impostos rateados. Está no ar no Render com dados de demonstração: entre como comprador, aprovador ou admin.",
+    tags: ["Java 21", "Spring Boot 4", "Spring Security", "JWT", "PostgreSQL", "Flyway", "JPA/Hibernate", "Testcontainers", "Playwright", "Docker", "GitHub Actions", "Render"],
+    github: "https://github.com/devraphaeldiniz/gestao-compras-cotacoes",
+    demo: "https://compras-cotacoes.onrender.com",
+    cover: "/projetos/compras-cotacoes/02-cotacao-detalhe.png",
+    metrics: [
+      { value: "88", label: "testes (unidade + integração)" },
+      { value: "90%", label: "cobertura de linhas (JaCoCo)" },
+      { value: "0", label: "CVEs na imagem (Trivy)" },
+      { value: "3", label: "perfis com segregação de funções" }
+    ],
+    gallery: [
+      { src: "/projetos/compras-cotacoes/02-cotacao-detalhe.png", caption: "Cotação com dois itens: preço por item, frete e imposto, e o ranking pelos dois critérios (que discordam). A decisão só libera com 3 propostas válidas", width: 1201, height: 1073 },
+      { src: "/projetos/compras-cotacoes/01-produtos.png", caption: "Produtos e estoque: cadastro, movimentação, extrato e alerta de compra no estoque mínimo", width: 1440, height: 900 },
+      { src: "/projetos/compras-cotacoes/03-decisao-en.png", caption: "Cotação decidida pela pontuação ponderada, com quem decidiu e quando (interface em inglês)", width: 1201, height: 433 },
+      { src: "/projetos/compras-cotacoes/04-pedidos-en.png", caption: "Pedidos de compra com recebimento parcial (12 de 32 caixas), histórico e cancelamento do saldo", width: 1440, height: 900 },
+      { src: "/projetos/compras-cotacoes/05-swagger.png", caption: "Todos os endpoints documentados no Swagger, com autenticação por token", width: 1440, height: 900 }
+    ],
+    highlights: [
+      "Estoque mínimo põe o produto sozinho no rascunho de reposição, sem duplicar e com bloqueio pessimista contra corridas",
+      "Decisão só com 3+ propostas válidas e dois critérios: menor preço ou pontuação ponderada 70% preço / 30% prazo; escolha manual exige justificativa",
+      "Login com JWT e três perfis (comprador, aprovador, admin): quem cota não decide, e cada decisão, recebimento e cancelamento grava o usuário",
+      "Recebimento parcial com rateio de frete e imposto por item e preço médio ponderado em BigDecimal (HALF_UP)",
+      "Extrato de estoque e histórico de cada cotação e pedido; job agendado cancela cotações vencidas e lembra fornecedores por e-mail",
+      "E-mail enviado só depois do commit (@TransactionalEventListener + @Async): falha de SMTP não desfaz a operação",
+      "Mensagens de negócio e interface em português e inglês (Accept-Language ou ?lang=)",
+      "Teste de vulnerabilidade completo (Semgrep, Trivy, OWASP ZAP): 11 achados corrigidos com testes de regressão, proteção contra força bruta, CSP e HSTS",
+      "88 testes com PostgreSQL real via Testcontainers, 90% de cobertura, E2E da interface com Playwright e CI com Trivy",
+      "Observabilidade: logs em JSON, X-Request-Id em cada requisição e métricas de negócio no Prometheus"
+    ],
+    architectureDiagram: `[Interface web PT/EN (JS puro, CSP estrita)]   [Swagger / curl]
+                    │                                │
+                    ▼ HTTPS + JWT (comprador · aprovador · admin)
+        [Spring Boot 4 · Spring Security · Resource Server]
+                    │
+                    ├── produto ── Regra A: estoque mínimo → rascunho de cotação
+                    ├── cotacao ── itens, abertura, cancelamento, job de prazos
+                    ├── proposta ── cálculo por item + ranking (2 critérios) + decisão
+                    ├── pedido ── emissão, recebimento parcial, custo médio
+                    ├── historico · extrato ── trilha de auditoria
+                    └── notificacao ── e-mail após o commit (@Async)
+                    │
+                    ▼ JPA/Hibernate · SELECT ... FOR UPDATE
+        [PostgreSQL 16 · migrações Flyway]
+
+[GitHub Actions] ── testes (Testcontainers) · JaCoCo · E2E Playwright · Trivy
+[Render] ── deploy do Dockerfile a cada push no main`,
+    architecture: [
+      "Java 21 e Spring Boot 4 (Spring Framework 7, Hibernate 7, Jackson 3), organizado por domínio: produto, fornecedor, cotação, proposta, pedido, usuário",
+      "Schema versionado com Flyway e ddl-auto validate; a migração que trouxe cotação com vários itens converteu os dados existentes sem perder nada",
+      "MapStruct + Lombok para mapear entidades e DTOs (records) em tempo de compilação",
+      "Testes unitários com JUnit 5 e Mockito, de integração contra PostgreSQL real (Testcontainers) e E2E da interface com Playwright",
+      "Docker multi-stage com usuário sem privilégio; deploy no Render por Blueprint (Postgres + serviço) e Mailpit no Docker Compose local"
+    ],
+    codeSnippet: {
+      title: "proposta/AvaliadorPropostasService.java: pontuação dos dois critérios (trecho)",
+      language: "java",
+      code: `private BigDecimal pontuar(Proposta proposta, CriterioDecisao criterio, BigDecimal menorTotal, int menorPrazo) {
+    BigDecimal pontuacao = switch (criterio) {
+        case MENOR_PRECO -> componentePreco(menorTotal, proposta.getValorTotal(), CEM);
+        case PONTUACAO_PONDERADA -> componentePreco(menorTotal, proposta.getValorTotal(), PESO_PRECO)
+                .add(componentePrazo(menorPrazo, proposta.getPrazoEntregaDias()));
+    };
+    return pontuacao.setScale(ESCALA_PONTUACAO, RoundingMode.HALF_UP);
+}
+
+private static BigDecimal componentePrazo(int menorPrazo, int prazo) {
+    if (prazo == 0) {
+        return PESO_PRAZO;
+    }
+    return BigDecimal.valueOf(menorPrazo).divide(BigDecimal.valueOf(prazo), PRECISAO).multiply(PESO_PRAZO);
+}`
+    },
+    challenges: [
+      {
+        problem: "Duas baixas de estoque simultâneas perdiam atualização: no teste com 20 requisições em paralelo, o saldo terminava 3 unidades acima do certo.",
+        solution: "Bloqueio pessimista (SELECT ... FOR UPDATE) no produto, com os produtos travados sempre em ordem de id para evitar deadlock. Um teste de integração dispara as requisições em threads reais e confere o saldo exato."
+      },
+      {
+        problem: "Garantir que a compra não fique na mão de uma pessoa só, como acontecia no processo manual.",
+        solution: "Perfis separados no JWT: o comprador abre a cotação e registra propostas, mas só o aprovador decide e recebe. A decisão exige 3 propostas válidas e grava o critério, quem decidiu e, se a escolha fugir da recomendação, a justificativa."
+      },
+      {
+        problem: "Mandar o e-mail de convite dentro da transação faria uma falha de SMTP desfazer a abertura da cotação, ou mandaria convite de uma cotação que não foi salva.",
+        solution: "A abertura publica um evento consumido com @TransactionalEventListener(AFTER_COMMIT) e @Async: o e-mail só sai depois do commit, e uma falha fica registrada na tabela de notificações sem afetar a operação."
+      },
+      {
+        problem: "As mensagens de 401 e 403 saíam em inglês mesmo com a requisição em português.",
+        solution: "O filtro de segurança roda antes do Spring MVC resolver o idioma. As respostas de segurança passaram a resolver o idioma pelo mesmo critério da API (?lang= ou Accept-Language), com teste de regressão."
+      }
+    ]
   }
 ];
