@@ -22,6 +22,7 @@ const LinkedinIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 const skills = [
   { name: "TypeScript / JavaScript / SQL", category: "Linguagens" },
   { name: "Node.js / Express / Fastify", category: "Back-end" },
+  { name: "Java 21 / Spring Boot", category: "Back-end" },
   { name: "Next.js / React / Tailwind", category: "Front-end" },
   { name: "PostgreSQL & Supabase", category: "Banco de Dados" },
   { name: "RLS, RBAC & JWT", category: "Segurança" },
@@ -29,7 +30,7 @@ const skills = [
   { name: "Workers, Filas & APIs", category: "Engenharia" }
 ];
 
-const featuredSlugs = ["nexus-shop", "ecommerce-supabase"];
+const featuredSlugs = ["gestao-compras-cotacoes", "nexus-shop"];
 const featuredProjects = featuredSlugs
   .map((slug) => projectsData.find((project) => project.slug === slug))
   .filter((project): project is (typeof projectsData)[number] => Boolean(project));
@@ -84,13 +85,13 @@ export default function Home() {
             Disponível para novas oportunidades
           </motion.div>
           <motion.a
-            href="#astacar"
+            href="/projetos/gestao-compras-cotacoes"
             initial={{ y: 20 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.5, delay: 0.05 }}
             className="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/30 text-cyan-300 text-sm font-medium hover:bg-cyan-400/20 transition-colors"
           >
-            Novo: AstaCar está no ar <ArrowRight className="w-3.5 h-3.5" />
+            Novo: Gestão de Compras em Java e Spring Boot <ArrowRight className="w-3.5 h-3.5" />
           </motion.a>
 
           <motion.h1 
@@ -108,7 +109,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg sm:text-2xl text-slate-300 max-w-3xl leading-relaxed"
           >
-            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript e PostgreSQL. Construo do banco ao deploy: o AstaCar, meu projeto de locadora de carros, está no ar, com Mercado Pago em modo de teste e 105 testes de unidade.
+            <span className="text-white font-medium">Desenvolvedor Backend/Fullstack Júnior</span> focado em Node.js, TypeScript, Java (Spring Boot) e PostgreSQL. Construo do banco ao deploy: o AstaCar, meu projeto de locadora de carros, está no ar, com Mercado Pago em modo de teste e 105 testes de unidade.
           </motion.p>
 
           <motion.div 
@@ -187,7 +188,7 @@ export default function Home() {
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-400">Projetos</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2">O que eu construí</h2>
-            <p className="text-slate-300 text-base mt-2 max-w-2xl">Projetos autorais, desafios técnicos de vagas e estudos. Todos têm o código aberto no GitHub, e o AstaCar e o Nexus Shop têm demonstração no ar.</p>
+            <p className="text-slate-300 text-base mt-2 max-w-2xl">Projetos autorais, desafios técnicos de vagas e estudos. Todos têm o código aberto no GitHub, e o AstaCar, o Gestão de Compras e o Nexus Shop têm demonstração no ar.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
